@@ -9,41 +9,43 @@
   <style>
     body { max-width: 48em; }
     .exercise-block {
-      background: var(--bg-code);
-      border: 1px solid var(--border-light);
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin: 2rem 0;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2.5rem 0;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
     }
     .exercise-header {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      margin-bottom: 1rem;
-      border-bottom: 2px solid var(--border-light);
-      padding-bottom: 0.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid var(--glass-border);
+      padding-bottom: 0.8rem;
     }
     .exercise-id {
-      font-family: var(--font-code);
+      font-family: var(--font-display);
       font-weight: 700;
-      color: var(--accent);
-      font-size: 1.2rem;
+      color: var(--accent-primary);
+      font-size: 1.3rem;
     }
     .exercise-title {
-      font-family: var(--font-ui);
-      font-size: 1.1rem;
+      font-family: var(--font-display);
+      font-size: 1.2rem;
       font-weight: 600;
       color: var(--fg);
     }
     .spec-section { margin-top: 1.5rem; }
     .spec-title {
-      font-family: var(--font-ui);
-      font-size: 0.9rem;
+      font-family: var(--font-display);
+      font-size: 1rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: var(--fg-light);
-      margin-bottom: 0.5rem;
+      color: var(--accent-primary);
+      margin-bottom: 0.8rem;
     }
     .acceptance-list {
       list-style-type: none;
@@ -51,23 +53,25 @@
     }
     .acceptance-list li {
       position: relative;
-      padding-left: 1.8rem;
-      margin-bottom: 0.5rem;
+      padding-left: 2rem;
+      margin-bottom: 0.8rem;
+      line-height: 1.5;
     }
     .acceptance-list li::before {
       content: "☐";
       position: absolute;
       left: 0;
-      color: var(--fg-light);
-      font-size: 1.2rem;
-      line-height: 1.2;
+      color: var(--accent-secondary);
+      font-size: 1.4rem;
+      line-height: 1.1;
+      font-family: var(--font-code);
     }
   </style>
 </head>
 <body>
 
-<h1>🔨 Hands-On Exercises</h1>
-<p>This document contains the specifications and acceptance criteria for all build exercises in the 4-week Exgester Mastery curriculum.</p>
+<h1>🔨 Hands-On Exercises (Deep Dive)</h1>
+<p>This document contains the specifications and acceptance criteria for all build exercises. In the enterprise Exgester module, there are no shortcuts. Your code must strictly adhere to the functional principles taught.</p>
 
 <div class="callout tip">
   <div class="callout-title">The Honor System</div>
@@ -78,60 +82,48 @@
 <div class="exercise-block" id="day1">
   <div class="exercise-header">
     <span class="exercise-id">DAY 1</span>
-    <span class="exercise-title">Trade Domain Model</span>
+    <span class="exercise-title">Deeply Immutable Trade Domain Model</span>
   </div>
   
-  <p>In Exgester, the <code>Trade</code> object is passed through dozens of steps. It must be absolutely immutable to prevent accidental data corruption.</p>
+  <p>In Exgester, the <code>Trade</code> object is passed through dozens of steps. It must be absolutely immutable to prevent accidental data corruption across JMS threads.</p>
 
   <div class="spec-section">
     <div class="spec-title">Specification</div>
-    <p>Create a pure Java project (no Spring yet). Implement a <code>Trade</code> class and a <code>Counterparty</code> class.</p>
-    <ul>
-      <li><code>Trade</code> fields: <code>tradeId</code> (String), <code>notional</code> (Double), <code>region</code> (String), <code>parties</code> (List of Counterparty)</li>
-      <li><code>Counterparty</code> fields: <code>lei</code> (String), <code>role</code> (String)</li>
-    </ul>
-    <p>Make both classes 100% immutable. Provide a <code>withRegion(String region)</code> method on Trade that returns a new Trade instance with the updated region.</p>
+    <p>Create a <code>sealed interface TradeEvent</code> permitting exactly 3 records: <code>NewTrade</code>, <code>AmendTrade</code>, and <code>CancelTrade</code>. Ensure deep immutability using Java 10+ <code>List.copyOf()</code> in compact constructors.</p>
   </div>
 
   <div class="spec-section">
     <div class="spec-title">Acceptance Criteria</div>
     <ul class="acceptance-list">
-      <li>All classes are <code>final</code>.</li>
-      <li>All fields are <code>private final</code>.</li>
-      <li>There are NO setter methods.</li>
-      <li>The constructor makes a <em>defensive copy</em> of the <code>parties</code> list (e.g., using <code>List.copyOf()</code> or <code>Collections.unmodifiableList()</code>).</li>
-      <li>Calling <code>getParties()</code> returns an unmodifiable list.</li>
-      <li>Calling <code>trade.withRegion("EMIR")</code> returns a completely new Trade instance with identical fields except the region.</li>
+      <li><code>TradeEvent</code> is a <code>sealed interface</code> permitting only the 3 specific records.</li>
+      <li><code>NewTrade</code> has a compact constructor that intercepts the <code>parties</code> List and reassigns it via <code>List.copyOf(parties)</code> to prevent shallow immutability traps.</li>
+      <li><code>NewTrade</code> has a "Wither" method: <code>withRegion(String region)</code> returning a new record instance.</li>
+      <li>No reflection or setter-based instantiation is used.</li>
     </ul>
   </div>
-</div>
-
-<!-- Placeholder for future exercises -->
-<div style="text-align: center; margin-top: 3rem; color: var(--fg-muted);">
-  More exercises will be unlocked as you progress through the coursework.
 </div>
 
 <!-- ================= DAY 2 ================= -->
 <div class="exercise-block" id="day2">
   <div class="exercise-header">
     <span class="exercise-id">DAY 2</span>
-    <span class="exercise-title">Safe Trade Parser</span>
+    <span class="exercise-title">Safe Parsing & Context Tuples</span>
   </div>
   
   <p>Data from external sources is untrustworthy. You must parse it safely without throwing runtime exceptions that crash our threads.</p>
 
   <div class="spec-section">
     <div class="spec-title">Specification</div>
-    <p>Using <code>com.fasterxml.jackson.databind.ObjectMapper</code> and Vavr's <code>Try</code>, write a class <code>TradeParser</code> with a method <code>Try&lt;Trade&gt; parseTrade(String json)</code>.</p>
-    <p>Also, write a method <code>Tuple2&lt;String, Double&gt; extractSummary(Trade trade)</code> that returns the Trade ID and Notional amount as a Tuple.</p>
+    <p>Using <code>com.fasterxml.jackson.databind.ObjectMapper</code> (with VavrModule registered) and Vavr's <code>Try</code>, write a class <code>TradeParser</code>.</p>
   </div>
 
   <div class="spec-section">
     <div class="spec-title">Acceptance Criteria</div>
     <ul class="acceptance-list">
-      <li>Calling <code>parseTrade</code> with valid JSON returns <code>Try.Success</code> containing a populated Trade object.</li>
-      <li>Calling <code>parseTrade</code> with invalid/malformed JSON returns <code>Try.Failure</code> containing the exception. It does <em>not</em> throw an exception.</li>
-      <li>Calling <code>extractSummary</code> returns a Vavr <code>Tuple2</code> with the correct fields.</li>
+      <li>Calling <code>parseTrade(String json)</code> returns a <code>Try&lt;NewTrade&gt;</code>.</li>
+      <li>Use <code>.recover()</code> to map a <code>JsonParseException</code> into a default dummy <code>NewTrade</code> for testing, but let <code>IllegalArgumentException</code> propagate as a <code>Failure</code>.</li>
+      <li>Write a method <code>buildContext(NewTrade trade)</code> that calculates a hash of the trade and returns a <code>Tuple2&lt;NewTrade, String&gt;</code> (the trade and its hash).</li>
+      <li>Vavr's <code>Option&lt;String&gt;</code> is used correctly in the domain model for optional JSON fields instead of <code>java.util.Optional</code>.</li>
     </ul>
   </div>
 </div>
@@ -140,19 +132,20 @@
 <div class="exercise-block" id="day3">
   <div class="exercise-header">
     <span class="exercise-id">DAY 3</span>
-    <span class="exercise-title">First Either Validation</span>
+    <span class="exercise-title">Strongly Typed ROP</span>
   </div>
 
   <div class="spec-section">
     <div class="spec-title">Specification</div>
-    <p>Create a class <code>TradeValidator</code>. Write a method <code>Either&lt;String, Trade&gt; validateLei(Trade trade)</code>. If the Trade's Counterparty LEI is blank or null, return a Left with the error message "Missing LEI". Otherwise, return a Right with the trade.</p>
+    <p>Create a class <code>TradeValidator</code>. Instead of returning <code>Either&lt;String, Trade&gt;</code>, you must return <code>Either&lt;Rejection, NewTrade&gt;</code> where <code>Rejection</code> is a custom Java 17 Record containing a fault code, message, and the offending Trade.</p>
   </div>
 
   <div class="spec-section">
     <div class="spec-title">Acceptance Criteria</div>
     <ul class="acceptance-list">
-      <li>Method returns <code>Either.right(trade)</code> for a trade with a valid LEI.</li>
-      <li>Method returns <code>Either.left("Missing LEI")</code> for a trade with no LEI.</li>
+      <li>Create the <code>Rejection(String code, String msg, NewTrade payload)</code> record.</li>
+      <li>Write <code>validateLei(NewTrade trade)</code>. Returns <code>Either.right(trade)</code> if LEI exists, else <code>Either.left(new Rejection(...))</code>.</li>
+      <li>Implement a <code>process(String json)</code> method that parses the JSON, validates it, and uses <code>fold()</code> at the end to print either "Sent to DLQ: [Rejection]" or "Sent downstream: [Trade]".</li>
     </ul>
   </div>
 </div>
@@ -161,20 +154,21 @@
 <div class="exercise-block" id="day4">
   <div class="exercise-header">
     <span class="exercise-id">DAY 4</span>
-    <span class="exercise-title">Composable Pipeline Steps</span>
+    <span class="exercise-title">Side Effects & Strategy Mapping</span>
   </div>
 
   <div class="spec-section">
     <div class="spec-title">Specification</div>
-    <p>Add 4 more validation methods to <code>TradeValidator</code> (e.g., <code>validateNotional</code>, <code>validateRegion</code>). Then, create a method <code>Either&lt;String, Trade&gt; process(Trade trade)</code> that chains them all together using <code>flatMap</code>.</p>
+    <p>We need to extract our validation pipeline into a Strategy map so we can route trades differently based on their Region.</p>
   </div>
 
   <div class="spec-section">
     <div class="spec-title">Acceptance Criteria</div>
     <ul class="acceptance-list">
-      <li>The <code>process</code> method contains exactly one return statement and chains multiple methods using <code>.flatMap(this::validate...)</code>.</li>
-      <li>If the first validation fails, the subsequent validations are never executed.</li>
-      <li>If all validations pass, a Right is returned.</li>
+      <li>Create an interface <code>RegionStrategy extends Function&lt;NewTrade, Either&lt;Rejection, NewTrade&gt;&gt;</code>.</li>
+      <li>Implement <code>EmirStrategy</code> and <code>AsicStrategy</code>. Chain multiple validations in each using <code>flatMap</code>.</li>
+      <li>Use <code>.peek()</code> to log a simulated metric whenever a validation step successfully passes.</li>
+      <li>In your main engine, use a <code>Map&lt;String, RegionStrategy&gt;</code> to look up the correct pipeline and execute it dynamically.</li>
     </ul>
   </div>
 </div>

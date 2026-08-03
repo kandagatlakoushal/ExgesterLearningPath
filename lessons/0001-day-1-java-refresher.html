@@ -3,103 +3,118 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Day 1: Java 11+ Refresher & Immutability</title>
+  <title>Day 1: Enterprise Immutability & Java 17</title>
   <link rel="stylesheet" href="../assets/shared.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
 </head>
 <body>
 
 <div class="lesson-meta">
-  <span><span class="tag tag-knowledge">Knowledge</span> Day 1</span>
-  <span>⏱️ 20 min read</span>
+  <span class="tag tag-knowledge">Deep Dive</span>
+  <span>⏱️ 40 min read</span>
 </div>
 
-<h1>Day 1: Java 11+ Refresher & Immutability</h1>
+<h1>Day 1: Enterprise Immutability & Java 17</h1>
 
-<p>Welcome to Day 1 of Exgester Mastery. Before we dive into Railway-Oriented Programming and Spring profiles, we must ensure our foundational Java skills are solid. The Exgester codebase relies heavily on modern Java idioms to keep complex data transformations safe.</p>
+<p>Welcome to Day 1 of Exgester Mastery. In an event-driven system processing thousands of trades per second across multi-threaded asynchronous consumers (JMS listeners), <strong>state mutation is the enemy of predictability</strong>. Exgester relies on strict immutability to guarantee thread safety without the performance bottleneck of <code>synchronized</code> locks.</p>
 
-<p>Today, we will focus on the most important concept in data-heavy pipelines: <strong>Immutability</strong>.</p>
-
-<div class="callout tip">
-  <div class="callout-title">The Exgester Context</div>
-  <p>In Exgester, a trade event passes through dozens of decision steps. If one step modifies the trade object in place (mutability), it becomes impossible to reason about what the trade looked like at the start of the pipeline vs the end. Bugs become untraceable.</p>
+<div class="callout key-insight">
+  <div class="callout-title">The Threading Context in Exgester</div>
+  <p>When an AMQ message arrives, Spring spins up a listener thread. That thread parses the JSON and passes the resulting <code>Trade</code> object through a Vavr <code>Either</code> pipeline. If any step mutates the trade (e.g., normalizes a currency code in-place), you lose the audit trail. If the trade is passed to an asynchronous <code>CompletableFuture</code> for external reference data lookup, an in-place mutation will cause a catastrophic race condition.</p>
 </div>
 
-<h2>1. The Power of Immutability</h2>
+<h2>1. Java 17 Records vs. Boilerplate POJOs</h2>
 
-<p>An immutable object cannot be changed after it is constructed. To "change" an immutable object, you must create a <strong>new</strong> instance with the updated values.</p>
+<p>Historically, achieving immutability in Java required massive boilerplate: <code>private final</code> fields, a constructor assigning all fields, no setters, and verbose <code>equals()</code>, <code>hashCode()</code>, and <code>toString()</code> methods. While Lombok's <code>@Value</code> helped, Java 17 native <strong>Records</strong> are superior for domain modeling.</p>
 
-<h3>The Anti-Pattern: Mutable POJO</h3>
 <pre><code class="language-java">
-// ❌ BAD: Mutable
-public class Trade {
-    private String tradeId;
-    private String status;
+// ✅ Native Java 17 Record
+public record Trade(
+    String tradeId, 
+    String region, 
+    double notional,
+    List&lt;Counterparty&gt; parties
+) {
+    // Records automatically generate getters, equals, hashCode, and toString.
+}
+</code></pre>
+
+<h3>The JVM Semantics of Records</h3>
+<p>Unlike regular classes, records have special JVM-level semantics. They are transparent carriers of immutable data. Serialization frameworks (like Jackson) can deserialize them without needing a no-arg constructor, bypassing the reflection hacks required for standard POJOs. This is critical for Exgester's JMS message parsing.</p>
+
+<h2>2. The Trap of Shallow Immutability</h2>
+
+<p>A record guarantees that its <em>references</em> cannot be reassigned. It does <strong>not</strong> guarantee that the objects being referenced are immutable. This is the "Shallow Immutability Trap."</p>
+
+<pre><code class="language-java">
+public record Trade(String tradeId, List&lt;String&gt; tags) {}
+
+// ❌ DANGEROUS: The list reference is final, but the list contents are mutable!
+List&lt;String&gt; mutableTags = new ArrayList&lt;&gt;();
+mutableTags.add("EMIR");
+Trade myTrade = new Trade("T1", mutableTags);
+
+mutableTags.add("ASIC"); // myTrade now has "ASIC" too! Thread-safety broken.
+</code></pre>
+
+<h3>Defensive Copying in Record Constructors</h3>
+<p>To achieve <em>Deep Immutability</em>, you must intercept the record's compact constructor and enforce immutability on collection types using <code>List.copyOf()</code> (introduced in Java 10, significantly safer than <code>Collections.unmodifiableList()</code> because it guarantees no underlying mutable reference exists).</p>
+
+<pre><code class="language-java">
+public record Trade(String tradeId, List&lt;String&gt; tags) {
+    // Compact constructor - executes during instantiation
+    public Trade {
+        // Requires Java 10+. Creates a truly unmodifiable copy.
+        // If 'tags' is already an unmodifiable List, it avoids copying.
+        tags = tags == null ? List.of() : List.copyOf(tags);
+    }
+}
+</code></pre>
+
+<h2>3. Wither Methods for State Transitions</h2>
+
+<p>In Exgester, a trade might undergo normalization (e.g., converting a legacy client ID to a standardized LEI). Since we can't mutate the record, we use "Wither" methods. A Wither method returns a completely new instance with one specific field changed, copying the rest.</p>
+
+<pre><code class="language-java">
+public record Trade(String tradeId, String region, double notional) {
     
-    // Setters allow anyone to modify the state at any time
-    public void setStatus(String status) {
-        this.status = status;
+    // The "Wither" pattern
+    public Trade withRegion(String newRegion) {
+        return new Trade(
+            this.tradeId,
+            newRegion,
+            this.notional
+        );
     }
 }
 </code></pre>
+<p><em>Note: While Lombok provides <code>@With</code>, understanding the mechanical allocation underneath is vital. Creating new objects creates garbage collection (GC) pressure. However, the modern JVM (especially G1GC and ZGC) is highly optimized for short-lived object allocation (Eden space). The cost of allocation is far outweighed by the safety of lock-free thread semantics.</em></p>
 
-<h3>The Solution: Immutable Value Object</h3>
-<pre><code class="language-java">
-// ✅ GOOD: Immutable with Java 17 Records
-public record Trade(String tradeId, String status) {
-    
-    // To change status, return a new copy
-    public Trade withStatus(String newStatus) {
-        return new Trade(this.tradeId, newStatus);
-    }
-}
-</code></pre>
+<h2>4. Sealing the Domain Hierarchy</h2>
 
-<h2>2. Optional: Banishing NullPointerExceptions</h2>
-
-<p>Exgester pipelines are allergic to <code>null</code>. When you look up a region config, or parse an optional XML field, you must use <code>Optional</code> to signal to the caller that the value might be missing.</p>
+<p>Exgester processes multiple <em>types</em> of events: <code>NewTrade</code>, <code>AmendTrade</code>, and <code>CancelTrade</code>. Instead of relying on a fragile <code>String actionType</code> field, we use Java 17 <strong>Sealed Classes</strong> to strictly define the domain hierarchy. This forces exhaustive pattern matching downstream.</p>
 
 <pre><code class="language-java">
-// ❌ BAD: Returns null
-public String getLei(Trade trade) {
-    if (trade.getCounterparty() != null) {
-        return trade.getCounterparty().getLei();
-    }
-    return null; // A crash waiting to happen downstream
-}
+// The domain is locked. No one can create an unexpected TradeEvent subclass.
+public sealed interface TradeEvent permits NewTrade, AmendTrade, CancelTrade {}
 
-// ✅ GOOD: Returns Optional
-public Optional&lt;String&gt; getLei(Trade trade) {
-    return Optional.ofNullable(trade.getCounterparty())
-                   .map(Counterparty::getLei);
-}
-</code></pre>
-
-<h2>3. Streams & Lambdas</h2>
-
-<p>Declarative data processing is key. Instead of <code>for</code> loops that mutate a list, we use Streams to map and filter data.</p>
-
-<pre><code class="language-java">
-// Find all trades that need EMIR reporting
-List&lt;Trade&gt; emirTrades = trades.stream()
-    .filter(t -&gt; "EMIR".equals(t.getRegion()))
-    .filter(t -&gt; t.getNotional() &gt; 10000)
-    .collect(Collectors.toList());
+public record NewTrade(String id, double notional) implements TradeEvent {}
+public record AmendTrade(String id, double delta) implements TradeEvent {}
+public record CancelTrade(String id, String reason) implements TradeEvent {}
 </code></pre>
 
 <hr>
 
-<h2>Your Build Task for Today</h2>
+<h2>Your Deep-Dive Build Task</h2>
 
 <div class="callout warning">
-  <div class="callout-title">Exercise: Trade Domain Model</div>
-  <p>Head over to <a href="../reference/exercises.html#day1">Exercises: Day 1</a>. Your task is to build a pure Java, deeply immutable <code>Trade</code> domain model using final classes, final fields, and defensive copying for Lists.</p>
+  <div class="callout-title">Exercise: Deeply Immutable Domain Model</div>
+  <p>Head to <a href="../reference/exercises.html#day1">Exercises: Day 1</a>. You are tasked with building a deeply immutable domain model using Java 17 Records, compact constructors for defensive copying of Collections, and sealed interfaces to model the exact event types Exgester receives.</p>
 </div>
-
-<p><em>When you're done, ask me to review your code!</em></p>
 
 <nav class="lesson-nav">
   <a href="../reference/curriculum.html">← Curriculum</a>
+  <a href="0002-day-2-vavr-intro.html">Next: Day 2 →</a>
 </nav>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>

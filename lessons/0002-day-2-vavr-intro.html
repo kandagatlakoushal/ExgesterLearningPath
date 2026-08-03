@@ -3,97 +3,96 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Day 2: Introduction to Vavr</title>
+  <title>Day 2: Enterprise Vavr (Try, Option, Tuple)</title>
   <link rel="stylesheet" href="../assets/shared.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
 </head>
 <body>
 
 <div class="lesson-meta">
-  <span><span class="tag tag-knowledge">Knowledge</span> Day 2</span>
-  <span>⏱️ 25 min read</span>
+  <span class="tag tag-knowledge">Deep Dive</span>
+  <span>⏱️ 45 min read</span>
 </div>
 
-<h1>Day 2: Introduction to Vavr</h1>
+<h1>Day 2: Enterprise Vavr (Try, Option, Tuple)</h1>
 
-<p>The Exgester reporting engine leverages functional programming concepts to ensure robustness. Native Java provides some tools (like <code>java.util.Optional</code> and Streams), but they fall short for building robust pipelines. Enter <strong>Vavr</strong>, a functional library for Java 11+.</p>
+<p>In high-throughput Spring Boot applications like Exgester, relying on standard Java exception handling (<code>try/catch</code>) causes massive thread context-switching overhead. Generating stack traces is extremely expensive. Vavr introduces monads that encapsulate absence (<code>Option</code>) and failure (<code>Try</code>) as data, completely bypassing the stack trace generation penalty when used correctly.</p>
 
-<p>Today, we introduce three essential Vavr types: <code>Option</code>, <code>Try</code>, and <code>Tuple</code>.</p>
+<h2>1. Option vs. Java Optional</h2>
 
-<div class="callout key-insight">
-  <div class="callout-title">Why Vavr?</div>
-  <p>Vavr brings pure functional data structures and control structures (like Scala or Haskell) to Java. It allows us to treat exceptions and nulls as just another type of data, which is essential for Railway-Oriented Programming (ROP).</p>
-</div>
+<p>Java's <code>java.util.Optional</code> is heavily restricted. It was designed primarily as a return type to prevent <code>NullPointerException</code>s. Vavr's <code>Option</code> is a true monad. It implements <code>Iterable</code>, meaning it can be seamlessly flattened inside collections, and it serializes perfectly.</p>
 
-<h2>1. Vavr Option vs Java Optional</h2>
-
-<p>Vavr's <code>Option</code> is an object container which may or may not contain a value. Unlike Java's <code>Optional</code>, it implements <code>Iterable</code> and integrates seamlessly with Vavr collections, plus it provides better monadic operations.</p>
+<h3>The Jackson Serialization Problem</h3>
+<p>In Exgester, incoming JMS messages are parsed via Jackson. If you put a Java <code>Optional</code> as a field in a POJO, Jackson requires a specific <code>Jdk8Module</code> to deserialize it, and even then, it behaves unpredictably with <code>null</code> vs absent keys. Vavr <code>Option</code> integrates powerfully with <code>vavr-jackson</code>, accurately distinguishing between a <code>null</code> JSON value and an entirely missing JSON key.</p>
 
 <pre><code class="language-java">
-// Creating an Option
-Option&lt;String&gt; maybeLei = Option.of(trade.counterpartyLei());
+import io.vavr.control.Option;
 
-// Providing a default fallback
-String lei = maybeLei.getOrElse("UNKNOWN_LEI");
+public record Counterparty(String lei, Option&lt;String&gt; bicCode) {}
 
-// Transforming values safely
-Option&lt;Integer&gt; leiLength = maybeLei.map(String::length);
+// Safe chained lookups using flatMap
+Option&lt;String&gt; bic = Option.of(trade.getCounterparty())
+                           .flatMap(Counterparty::bicCode);
 </code></pre>
 
-<h2>2. Try: Exceptional Handling without try/catch</h2>
+<h2>2. Try: Exceptional Control Flow</h2>
 
-<p>In data pipelines, throwing exceptions breaks the flow. <code>Try</code> encapsulates a computation that might result in an exception. It has two states: <code>Success</code> and <code>Failure</code>.</p>
+<p>When interacting with the database or parsing complex XML/JSON, failures are expected. Throwing an exception unwinds the call stack, halting the pipeline. <code>Try&lt;T&gt;</code> captures computations that might fail, holding either a <code>Success(T)</code> or a <code>Failure(Throwable)</code>.</p>
+
+<h3>Lifting Exceptions into Data</h3>
+<p>By wrapping a risky operation in <code>Try</code>, you maintain referential transparency. The function always returns a value, making it highly testable.</p>
 
 <pre><code class="language-java">
-// ❌ BAD: Breaking the pipeline with exceptions
-public String parseJson(String json) {
-    try {
-        return objectMapper.readTree(json).get("tradeId").asText();
-    } catch (Exception e) {
-        throw new RuntimeException("Invalid JSON", e);
-    }
-}
-
-// ✅ GOOD: Returning a Try
-public Try&lt;String&gt; parseJsonSafe(String json) {
-    return Try.of(() -&gt; objectMapper.readTree(json).get("tradeId").asText());
+public Try&lt;Trade&gt; parsePayload(String rawJson) {
+    // Try.of catches all non-fatal exceptions
+    return Try.of(() -&gt; objectMapper.readValue(rawJson, Trade.class));
 }
 </code></pre>
 
-<p>You can then recover from failures cleanly:</p>
+<h3>Recovering Gracefully</h3>
+<p>In a large application, you don't just "fail"; you attempt fallbacks. <code>Try.recover()</code> or <code>Try.recoverWith()</code> allows you to specify exact exception types and provide alternate resolution paths.</p>
+
 <pre><code class="language-java">
-String safeTradeId = parseJsonSafe(rawPayload)
-    .recover(JsonParseException.class, "DEFAULT_ID")
-    .getOrElse("UNKNOWN_ID");
+Try&lt;Trade&gt; result = parsePayload(json)
+    .recover(JsonParseException.class, e -&gt; {
+        log.warn("Malformed JSON. Attempting legacy parser...");
+        return legacyParser.parse(json); 
+    })
+    .recover(IllegalArgumentException.class, e -&gt; {
+        log.error("Missing mandatory fields.");
+        throw e; // We can explicitly re-throw if it's unrecoverable
+    });
 </code></pre>
 
-<h2>3. Tuples: Returning Multiple Values</h2>
+<h2>3. Type-Safe Tuples in Routing</h2>
 
-<p>Often, a function needs to return multiple values. Creating a Java 17 <code>record</code> for every minor grouping is overkill. Vavr provides <code>Tuple1</code> to <code>Tuple8</code>.</p>
+<p>Often, a pipeline step needs to calculate a value and pass *both* the original trade and the new value downstream. Java forces you to either create a temporary DTO class or mutate the original object. Both are bad. Vavr <code>Tuple</code> solves this.</p>
 
 <pre><code class="language-java">
-// Grouping related items instantly
-Tuple2&lt;String, Double&gt; tradeSummary = Tuple.of(trade.tradeId(), trade.notional());
+// A function that returns the Trade alongside its calculated Regulatory Region
+public Tuple2&lt;Trade, String&gt; determineRegion(Trade trade) {
+    String region = routingEngine.getRegion(trade.lei());
+    return Tuple.of(trade, region);
+}
 
-// Accessing values
-String id = tradeSummary._1;
-Double not = tradeSummary._2;
+// Downstream usage
+Tuple2&lt;Trade, String&gt; context = determineRegion(trade);
 
-// Mapping over a tuple
-Tuple2&lt;String, Double&gt; updated = tradeSummary.map2(n -&gt; n * 1.5);
+// We can map specific elements of the tuple without unpacking it!
+Tuple2&lt;Trade, String&gt; mappedContext = context.map2(region -&gt; "REGION_" + region);
 </code></pre>
 
 <hr>
 
-<h2>Your Build Task for Today</h2>
+<h2>Your Deep-Dive Build Task</h2>
 
 <div class="callout warning">
-  <div class="callout-title">Exercise: Safe Trade Parser</div>
-  <p>Head over to <a href="../reference/exercises.html#day2">Exercises: Day 2</a>. You will use Vavr's <code>Try</code> to parse incoming JSON payloads safely, avoiding runtime exceptions from corrupt data.</p>
+  <div class="callout-title">Exercise: Safe Parsing & Context Tuples</div>
+  <p>Head to <a href="../reference/exercises.html#day2">Exercises: Day 2</a>. You will implement a resilient Jackson parser wrapped in <code>Try</code>, handle specific recovery scenarios, and build a routing context using <code>Tuple2</code> to prepare for tomorrow's complex decision pipelines.</p>
 </div>
 
 <nav class="lesson-nav">
-  <a href="../reference/curriculum.html">← Curriculum</a>
+  <a href="0001-day-1-java-refresher.html">← Previous: Day 1</a>
   <a href="0003-day-3-rop-basics.html">Next: Day 3 →</a>
 </nav>
 
