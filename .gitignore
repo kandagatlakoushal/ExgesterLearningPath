@@ -1,0 +1,21 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# Agent workspace (local only, not published)
+.agents/
+
+# Java build artifacts (from user's exercise projects)
+target/
+*.class
+*.jar
+
+# Node
+node_modules/

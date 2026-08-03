@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vavr Either&lt;L,R&gt; — Quick Reference</title>
+  <link rel="stylesheet" href="../assets/shared.css">
+</head>
+<body>
+
+<h1>Vavr Either&lt;L,R&gt; — Quick Reference</h1>
+
+<div class="lesson-meta">
+  <span>📖 Reference Document</span>
+  <span>🔗 <a href="https://www.vavr.io/vavr-docs/">Vavr Docs</a></span>
+  <span>🔗 <a href="https://www.javadoc.io/doc/io.vavr/vavr/latest/index.html">Javadoc</a></span>
+</div>
+
+<h2>Creating</h2>
+<pre><code><span class="type">Either</span>&lt;<span class="type">String</span>, <span class="type">Integer</span>&gt; success = <span class="type">Either</span>.right(<span class="num">42</span>);
+<span class="type">Either</span>&lt;<span class="type">String</span>, <span class="type">Integer</span>&gt; failure = <span class="type">Either</span>.left(<span class="str">"not found"</span>);</code></pre>
+
+<h2>Core Operations (Right-biased)</h2>
+<table>
+  <tr><th>Method</th><th>What it does</th><th>On Left?</th></tr>
+  <tr>
+    <td><code>map(f)</code></td>
+    <td>Transforms the Right value: <code>Right(x) → Right(f(x))</code></td>
+    <td>Returns self unchanged</td>
+  </tr>
+  <tr>
+    <td><code>flatMap(f)</code></td>
+    <td>Transforms & flattens: <code>Right(x) → f(x)</code> where f returns Either</td>
+    <td>Returns self unchanged</td>
+  </tr>
+  <tr>
+    <td><code>mapLeft(f)</code></td>
+    <td>Transforms the Left value: <code>Left(e) → Left(f(e))</code></td>
+    <td>Applies f to Left value</td>
+  </tr>
+  <tr>
+    <td><code>fold(onLeft, onRight)</code></td>
+    <td>Collapses both tracks into a single value</td>
+    <td>Calls onLeft function</td>
+  </tr>
+  <tr>
+    <td><code>peek(f)</code></td>
+    <td>Runs side effect on Right value, returns self</td>
+    <td>Returns self unchanged</td>
+  </tr>
+  <tr>
+    <td><code>peekLeft(f)</code></td>
+    <td>Runs side effect on Left value, returns self</td>
+    <td>Calls f on Left value</td>
+  </tr>
+  <tr>
+    <td><code>swap()</code></td>
+    <td>Swaps Left↔Right: <code>Right(x) → Left(x)</code></td>
+    <td><code>Left(e) → Right(e)</code></td>
+  </tr>
+  <tr>
+    <td><code>getOrElseGet(f)</code></td>
+    <td>Returns Right value, or applies f to Left</td>
+    <td>Returns f(leftValue)</td>
+  </tr>
+  <tr>
+    <td><code>orElse(other)</code></td>
+    <td>Returns self if Right, or other if Left</td>
+    <td>Returns other</td>
+  </tr>
+  <tr>
+    <td><code>filterOrElse(p, zero)</code></td>
+    <td>Keeps Right if predicate passes, else Left(zero)</td>
+    <td>Returns self unchanged</td>
+  </tr>
+</table>
+
+<h2>Pipeline Pattern (Railway-Oriented Programming)</h2>
+<pre><code><span class="cmt">// Each step returns Either&lt;Rejection, TradeContext&gt;</span>
+<span class="type">Either</span>&lt;<span class="type">Rejection</span>, <span class="type">TradeContext</span>&gt; result =
+    validateFormat(event)                     <span class="cmt">// Step 1</span>
+        .flatMap(<span class="kw">this</span>::checkDuplicate)       <span class="cmt">// Step 2 — skipped if Step 1 failed</span>
+        .flatMap(<span class="kw">this</span>::determineRegion)       <span class="cmt">// Step 3 — skipped if Step 2 failed</span>
+        .flatMap(<span class="kw">this</span>::buildSubmission)       <span class="cmt">// Step 4 — skipped if Step 3 failed</span>
+        .peek(sub -&gt; log.info(<span class="str">"Created: {}"</span>, sub))     <span class="cmt">// Logging (side effect)</span>
+        .peekLeft(rej -&gt; log.warn(<span class="str">"Rejected: {}"</span>, rej)); <span class="cmt">// Error logging</span></code></pre>
+
+<div class="callout key-insight">
+  <div class="callout-title">Key insight</div>
+  <p><code>flatMap</code> is the railway switch. If any step returns <code>Left</code>, all subsequent <code>flatMap</code> calls are skipped — the error rides the Left track to the end. No exceptions. No try-catch. No null checks.</p>
+</div>
+
+<h2>Track Diagram</h2>
+<div class="track-diagram">
+<span class="track-right">Right(event)</span> <span class="track-arrow">──▶</span> <span class="fn">validateFormat</span> <span class="track-arrow">──▶</span> <span class="fn">checkDuplicate</span> <span class="track-arrow">──▶</span> <span class="fn">determineRegion</span> <span class="track-arrow">──▶</span> <span class="fn">buildSubmission</span> <span class="track-arrow">──▶</span> <span class="track-right">Right(submission)</span>
+                         <span class="track-arrow">╲</span>                    <span class="track-arrow">╲</span>                     <span class="track-arrow">╲</span>                      <span class="track-arrow">╲</span>
+<span class="track-left">                          Left(err)</span> <span class="track-arrow">─────▶</span> <span class="track-left">Left(err)</span> <span class="track-arrow">──────▶</span> <span class="track-left">Left(err)</span> <span class="track-arrow">───────▶</span> <span class="track-left">Left(err)</span> <span class="track-arrow">──▶</span> <span class="track-left">Left(rejection)</span>
+</div>
+
+<h2>Converting Between Types</h2>
+<pre><code><span class="cmt">// Try → Either</span>
+<span class="type">Try</span>.of(() -&gt; riskyOperation())
+   .toEither()                      <span class="cmt">// Either&lt;Throwable, T&gt;</span>
+   .mapLeft(<span class="type">Throwable</span>::getMessage);  <span class="cmt">// Either&lt;String, T&gt;</span>
+
+<span class="cmt">// Option → Either</span>
+<span class="type">Option</span>.of(maybeNull)
+   .toEither(<span class="str">"Value was null"</span>);       <span class="cmt">// Either&lt;String, T&gt;</span>
+
+<span class="cmt">// Either → fold to a single type</span>
+<span class="type">String</span> message = result.fold(
+    rej -&gt; <span class="str">"Rejected: "</span> + rej.reason(),
+    sub -&gt; <span class="str">"Submitted: "</span> + sub.id()
+);</code></pre>
+
+<h2>Testing Either Values</h2>
+<pre><code><span class="cmt">// JUnit 5 assertions for Either</span>
+assertThat(result.isRight()).isTrue();
+assertThat(result.get()).isEqualTo(expectedSubmission);
+
+assertThat(result.isLeft()).isTrue();
+assertThat(result.getLeft()).isEqualTo(expectedRejection);
+
+<span class="cmt">// Pattern: extract and assert</span>
+result.peek(submission -&gt; {
+    assertThat(submission.getRegion()).isEqualTo(<span class="str">"EMIR"</span>);
+    assertThat(submission.getTradeId()).isNotNull();
+});</code></pre>
+
+<h2>Common Pitfalls</h2>
+<div class="callout warning">
+  <div class="callout-title">Watch out</div>
+  <ul>
+    <li>Using <code>get()</code> without checking <code>isRight()</code> — throws <code>NoSuchElementException</code> on Left</li>
+    <li>Using <code>map</code> when you need <code>flatMap</code> — creates nested <code>Either&lt;L, Either&lt;L, R&gt;&gt;</code></li>
+    <li>Performing side effects inside <code>map</code> — use <code>peek</code> instead to keep map pure</li>
+    <li>Forgetting that Either is <strong>right-biased</strong> — <code>map</code> ignores Left values</li>
+  </ul>
+</div>
+
+</body>
+</html>

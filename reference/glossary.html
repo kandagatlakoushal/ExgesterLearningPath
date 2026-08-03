@@ -1,0 +1,107 @@
+# Exgester Mastery Glossary
+
+Trade reporting domain vocabulary and technical terms used throughout this learning path. Every lesson adheres to this terminology.
+
+## Regulatory Domain
+
+**Trade Event**:
+An inbound message representing a financial transaction (creation, amendment, termination) that arrives via JMS for potential regulatory reporting.
+_Avoid_: Trade, transaction (too ambiguous)
+
+**Reportability**:
+The binary determination of whether a given trade event must be submitted to a regulatory authority. The core output of Exgester's decision engine.
+_Avoid_: Eligibility, qualification
+
+**Regulatory Region**:
+A specific jurisdiction's reporting regime — e.g., EMIR (EU), FCA (UK), ASIC (Australia), CFTC (US). A single trade event may trigger submissions to multiple regulatory regions.
+_Avoid_: Regulation, rule
+
+**Submission Message**:
+The structured output payload sent to a downstream reporting system after a trade event passes through the decision engine. Contains fields required by the applicable regulatory region.
+_Avoid_: Report, output
+
+**Trade Repository (TR)**:
+A centralized registry that collects and maintains records of derivative transactions. Each regulatory region mandates reporting to specific TRs.
+_Avoid_: Database, registry
+
+## Architecture
+
+**Decision Pipeline**:
+A chain of composable steps implemented as `Either<L,R>` transformations that evaluate a trade event and produce either a submission message (Right) or a rejection/error (Left). The backbone of Exgester.
+_Avoid_: Workflow, process, chain
+
+**Railway-Oriented Programming (ROP)**:
+A functional programming pattern using two-track types (Right = success, Left = failure) to compose sequential operations where any step can short-circuit the pipeline. Popularized by Scott Wlaschin.
+_Avoid_: Error handling pattern, monadic error flow
+
+**Multi-Tenant**:
+An architectural approach where a single deployed application serves multiple clients (banks) — each with potentially different decision rules, configs, and reporting flows — distinguished by Spring profiles.
+_Avoid_: Multi-client (in this workspace)
+
+**Profile (Spring)**:
+A Spring Framework mechanism (`@Profile("anz")`) that conditionally activates beans based on the runtime environment. In Exgester, profiles select client-specific decision steps and configuration.
+_Avoid_: Environment, mode
+
+## Vavr Types
+
+**Either<L, R>**:
+A disjoint union type holding exactly one of two values: `Left(L)` (conventionally failure) or `Right(R)` (conventionally success). Right-biased — `map` and `flatMap` operate on the Right track.
+_Avoid_: Result type, union type
+
+**Option<T>**:
+A Vavr replacement for `java.util.Optional`. Represents a value that may or may not exist. `Some(value)` or `None`.
+_Avoid_: Optional, nullable
+
+**Try<T>**:
+Wraps a computation that may throw. `Success(value)` or `Failure(throwable)`. Useful for bridging imperative exception-throwing code into functional pipelines.
+_Avoid_: Exception wrapper
+
+**Tuple**:
+An immutable, typed container for a fixed number of values. `Tuple2<A,B>`, `Tuple3<A,B,C>`, etc. Used to carry multiple values through a pipeline step.
+_Avoid_: Pair, triple
+
+## Java Fundamentals
+
+**Functional Interface**:
+A Java interface with exactly one abstract method, making it assignable from a lambda expression. Examples: `Function<T,R>`, `Predicate<T>`, `Consumer<T>`.
+_Avoid_: SAM interface, lambda interface
+
+**Constructor Injection**:
+The preferred Spring pattern where dependencies are provided via constructor parameters (typically with `@RequiredArgsConstructor` from Lombok), ensuring immutability and testability.
+_Avoid_: Autowiring (in this workspace — too ambiguous between field/setter/constructor)
+
+## Design Patterns
+
+**Strategy**:
+Encapsulates a family of interchangeable algorithms behind a common interface. In Exgester: different reportability rules per regulatory region.
+_Avoid_: Policy, algorithm switch
+
+**Factory**:
+Creates objects without exposing instantiation logic. In Exgester: constructing the correct submission message type based on regulatory region.
+_Avoid_: Creator, builder (distinct pattern)
+
+**Template Method**:
+Defines the skeleton of an algorithm in a base class, deferring specific steps to subclasses. In Exgester: common reporting flow with client-specific overrides.
+_Avoid_: Abstract workflow
+
+**Chain of Responsibility**:
+Passes a request along a chain of handlers, where each handler decides to process or forward it. In Exgester: sequential decision steps where each may accept, reject, or pass.
+_Avoid_: Handler chain, filter chain
+
+**Builder**:
+Separates construction of a complex object from its representation. In Exgester: building submission messages field-by-field (often via Lombok `@Builder`).
+_Avoid_: Assembler
+
+**Composite**:
+Composes objects into tree structures and lets clients treat individual objects and compositions uniformly. In Exgester: combining multiple decision rules into a single composite rule.
+_Avoid_: Tree pattern
+
+## Testing
+
+**BDD (Behavior-Driven Development)**:
+A testing methodology where tests are written in business-readable language (Gherkin) before implementation. Bridges the gap between domain experts and developers.
+_Avoid_: Acceptance testing (overlaps but distinct)
+
+**Gherkin**:
+The Given-When-Then language used to write Cucumber feature files. Each scenario describes a business behavior in human-readable steps.
+_Avoid_: Test language, feature syntax

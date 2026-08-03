@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hands-On Exercises &amp; Projects — Exgester Mastery</title>
+  <link rel="stylesheet" href="../assets/shared.css">
+  <style>
+    .exercise-card {
+      background: var(--bg-code);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .exercise-card h3 { margin-top: 0; }
+    .exercise-card.project-card { border-color: #f59e0b; background: #fffbeb; }
+    .exercise-card.milestone-card { border-color: var(--accent); background: var(--accent-soft); }
+
+    .ac-list { margin: 0.5rem 0 0 1.5rem; }
+    .ac-list li { margin-bottom: 0.3rem; font-size: 0.9rem; }
+
+    .file-hint {
+      font-family: var(--font-code);
+      font-size: 0.82rem;
+      background: #1e1e2e;
+      color: #cdd6f4;
+      padding: 0.6rem 1rem;
+      border-radius: 6px;
+      margin: 0.75rem 0;
+      overflow-x: auto;
+    }
+
+    .week-badge {
+      display: inline-block;
+      font-family: var(--font-ui);
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-right: 0.3rem;
+    }
+    .wb-1 { background: #dbeafe; color: #1e40af; }
+    .wb-2 { background: #dcfce7; color: #166534; }
+    .wb-3 { background: #fef3c7; color: #92400e; }
+    .wb-4 { background: #f3e8ff; color: #6b21a8; }
+    .wb-5 { background: #fee2e2; color: #991b1b; }
+
+    .difficulty {
+      display: inline-block;
+      font-family: var(--font-ui);
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.15rem 0.5rem;
+      border-radius: 3px;
+    }
+    .diff-starter { background: #dcfce7; color: #166534; }
+    .diff-intermediate { background: #fef3c7; color: #92400e; }
+    .diff-advanced { background: #fee2e2; color: #991b1b; }
+  </style>
+</head>
+<body>
+
+<h1>🔨 Hands-On Exercises &amp; Projects</h1>
+
+<div class="lesson-meta">
+  <span>📋 27 exercises across 5 weeks</span>
+  <span>🏗️ 4 progressive build milestones</span>
+  <span>🏆 1 capstone project</span>
+</div>
+
+<p>Every exercise is self-contained — you create the project yourself, write the code, and verify against the acceptance criteria listed. The exercises <strong>progressively build</strong> toward the Week 5 capstone: a mini trade reporting engine that mirrors Exgester's real architecture.</p>
+
+<div class="callout tip">
+  <div class="callout-title">How this works</div>
+  <p>Each exercise tells you <em>what</em> to build and how to verify it. You write the code. If you get stuck, use <code>/teach</code> and describe the exercise — I'll guide you without giving you the answer.</p>
+</div>
+
+<div class="callout key-insight">
+  <div class="callout-title">Progressive Build Strategy</div>
+  <p>Weeks 1–2 use standalone Java files (no Spring). Week 3 onward, you create a Spring Boot Maven project and keep growing it. By Week 5, it's a working mini-Exgester.</p>
+</div>
+
+<!-- ============================================================== -->
+<!-- WEEK 1 -->
+<!-- ============================================================== -->
+<h2><span class="week-badge wb-1">Week 1</span> Java Foundations &amp; Functional Thinking</h2>
+<p>All exercises this week are standalone Java files. Create a folder <code>week1/</code> in your workspace and write/run each exercise there with <code>javac</code> + <code>java</code> or your IDE.</p>
+
+<div class="exercise-card">
+  <h3>E1 · SOLID Trade Refactor <span class="difficulty diff-starter">Starter</span></h3>
+  <p><strong>Day 1 · ~45 min</strong></p>
+  <p>You are given a single <code>TradeProcessor</code> class that does everything: validates a trade, checks region, builds a message, and logs. It violates SRP, OCP, and DIP.</p>
+  <p><strong>Your task:</strong> Refactor it into separate classes following SOLID. Create at least 4 classes: <code>TradeValidator</code>, <code>RegionDeterminer</code>, <code>MessageBuilder</code>, and <code>TradeProcessor</code> that composes them.</p>
+  <p><strong>Starter code you write first (the "bad" version):</strong></p>
+  <div class="file-hint">// TradeProcessor.java — the monolith
+public class TradeProcessor {
+    public String process(String tradeId, String type, double notional, String region) {
+        // validation
+        if (tradeId == null || tradeId.isEmpty()) return "ERROR: no trade ID";
+        if (notional <= 0) return "ERROR: invalid notional";
+        // region logic
+        String reportingRegion;
+        if (region.equals("EU")) reportingRegion = "EMIR";
+        else if (region.equals("US")) reportingRegion = "CFTC";
+        else if (region.equals("AU")) reportingRegion = "ASIC";
+        else return "ERROR: unknown region";
+        // build message
+        String message = reportingRegion + "|" + tradeId + "|" + type + "|" + notional;
+        System.out.println("Processed: " + message);
+        return message;
+    }
+}</div>
+  <p><strong>Acceptance Criteria:</strong></p>
+  <ul class="ac-list">
+    <li>☐ No class has more than one reason to change</li>
+    <li>☐ Adding a new region (e.g. FCA) requires NO modification to existing classes</li>
+    <li>☐ <code>TradeProcessor</code> depends on interfaces, not concrete classes</li>
+    <li>☐ You can explain which SOLID principle each refactoring addresses</li>
+  </ul>
+</div>
+
+<div class="exercise-card">
+  <h3>E2 · Generic DecisionStep Interface <span class="difficulty diff-intermediate">Intermediate</span></h3>
+  <p><strong>Day 2 · ~60 min</strong></p>
+  <p><strong>Build:</strong> A generic <code>DecisionStep&lt;I, O&gt;</code> interface with a single method <code>O execute(I input)</code>. Then create 3 concrete implementations that chain together:</p>
+  <ul class="ac-list">
+    <li><code>ParseStep</code> — takes <code>String</code> → returns <code>TradeEvent</code></li>
+    <li><code>ValidateStep</code> — takes <code>TradeEvent</code> → returns <code>ValidatedTrade</code></li>
+    <li><code>EnrichStep</code> — takes <code>ValidatedTrade</code> → returns <code>EnrichedTrade</code></li>
+  </ul>
+  <p>Then write a <code>Pipeline</code> class that chains them: <code>String → TradeEvent → ValidatedTrade → EnrichedTrade</code>.</p>
+  <p><strong>Stretch:</strong> Add a wildcard method <code>addStep(DecisionStep&lt;? super T, ? extends R&gt;)</code>.</p>
+  <p><strong>Acceptance Criteria:</strong></p>
+  <ul class="ac-list">
+    <li>☐ Pipeline compiles and runs without raw types or unchecked casts</li>
+    <li>☐ Each step is independently testable</li>
+    <li>☐ You can explain why <code>? super T</code> and <code>? extends R</code> are needed</li>
+  </ul>
+</div>
+
+<div class="exercise-card">
+  <h3>E3 · Lambda Trade Filter <span class="difficulty diff-starter">Starter</span></h3>
+  <p><strong>Day 3 · ~45 min</strong></p>
+  <p><strong>Build:</strong> Create a <code>TradeEvent</code> record/class with fields: <code>tradeId</code>, <code>assetClass</code>, <code>notional</code>, <code>region</code>, <code>counterpartyLei</code>. Then create a <code>TradeFilterService</code> that accepts a <code>List&lt;Predicate&lt;TradeEvent&gt;&gt;</code> and applies them all.</p>
+  <p><strong>Write these filters as lambdas:</strong></p>
+  <ul class="ac-list">
+    <li>Notional above threshold (configurable)</li>
+    <li>Asset class is in allowed set {"IR", "FX", "CR"}</li>
+    <li>Counterparty LEI is not blank</li>
+    <li>Region is known</li>
+  </ul>
+  <p><strong>Acceptance Criteria:</strong></p>
+  <ul class="ac-list">
+    <li>☐ No filter logic is inside <code>TradeFilterService</code> — all passed as lambdas</li>
+    <li>☐ Filters are composed with <code>Predicate.and()</code></li>
+    <li>☐ A <code>main()</code> method tests with 10 sample trades, printing which pass and fail</li>
+  </ul>
+</div>
+
+<div class="exercise-card">
+  <h3>E4 · Stream Analytics Dashboard <span class="difficulty diff-intermediate">Intermediate</span></h3>
+  <p><strong>Day 4 · ~60 min</strong></p>
+  <p><strong>Build:</strong> Given a <code>List&lt;TradeEvent&gt;</code> of 20 sample trades, use only Streams to produce:</p>
+  <ul class="ac-list">
+    <li>Count of trades per region → <code>Map&lt;String, Long&gt;</code></li>
+    <li>Total notional per asset class → <code>Map&lt;String, Double&gt;</code></li>
+    <li>Top 5 trades by notional → <code>List&lt;TradeEvent&gt;</code></li>
+    <li>All unique counterparty LEIs → <code>Set&lt;String&gt;</code></li>
+    <li>Average notional for "IR" asset class → <code>OptionalDouble</code></li>
+    <li>Trades grouped by region, then by asset class → <code>Map&lt;String, Map&lt;String, List&lt;TradeEvent&gt;&gt;&gt;</code></li>
+  </ul>
+  <p><strong>Acceptance Criteria:</strong></p>
+  <ul class="ac-list">
+    <li>☐ Zero <code>for</code> loops — every computation uses Streams</li>
+    <li>☐ Each result is printed with a label</li>
+    <li>☐ Uses <code>Collectors.groupingBy</code>, <code>Collectors.summingDouble</code>, <code>Collectors.counting</code></li>
+  </ul>
+</div>
+
+<div class="exercise-card">
+  <h3>E5 · Immutable Trade Domain Model <span class="difficulty diff-starter">Starter</span></h3>
+  <p><strong>Day 5 · ~45 min</strong></p>
+  <p><strong>Build:</strong> Create the full immutable domain model you'll reuse for the rest of the course:</p>
+  <div class="file-hint">TradeEvent        — the raw inbound event (immutable)
+TradeContext      — enriched event with region + metadata (immutable)
+RejectionReason   — value object: code + message (immutable)
+SubmissionMessage — the outbound regulatory message (immutable, builder pattern)</div>
+  <p>Use manual immutability (final fields, no setters, constructor-only). <em>Later in Week 4, you'll convert these to Lombok @Value.</em></p>
+  <p><strong>Acceptance Criteria:</strong></p>
+  <ul class="ac-list">
+    <li>☐ All fields are <code>private final</code></li>
+    <li>☐ No setter methods anywhere</li>
+    <li>☐ Each class has <code>equals()</code>, <code>hashCode()</code>, <code>toString()</code></li>
+    <li>☐ <code>SubmissionMessage</code> uses a static inner Builder class</li>
+    <li>☐ Attempting to mutate any object results in a compile error</li>
+  </ul>
+</div>
+
+<div class="exercise-card">
+  <h3>E6 · Composable Validation Pipeline <span class="difficulty diff-intermediate">Intermediate</span></h3>
+  <p><strong>Day 6 · ~60 min</strong></p>
+  <p><strong>Build:</strong> Using <code>Function.andThen()</code> and <code>Predicate.and()</code>, compose a validation pipeline from 4 independent validators. Each validator is a <code>Function&lt;TradeEvent, Optional&lt;String&gt;&gt;</code> that returns <code>Optional.empty()</code> on success or <code>Optional.of("error message")</code> on failure.</p>
+  <p>Then build a <code>CompositeValidator</code> that runs all validators and collects all errors (not just the first).</p>
+  <p><strong>Acceptance Criteria:</strong></p>
+  <ul class="ac-list">
+    <li>☐ 4 validators: notional > 0, region not blank, tradeId matches pattern, assetClass in allowed set</li>
+    <li>☐ <code>CompositeValidator</code> returns <code>List&lt;String&gt;</code> of all errors, or empty list on success</li>
+    <li>☐ Adding a 5th validator requires only 1 line change</li>
+    <li>☐ Test with a trade event that fails 3 out of 4 validators — all 3 errors must be collected</li>
+  </ul>
+</div>
+
+<div class="exercise-card milestone-card">
+  <h3>🏁 Milestone 1 · Week 1 Integration <span class="difficulty diff-intermediate">Intermediate</span></h3>
+  <p><strong>Day 7 · ~90 min</strong></p>
+  <p><strong>Combine E1–E6:</strong> Wire together your domain model (E5), your lambda filters (E3), your composite validator (E6), and your generic pipeline (E2) into one working program that:</p>
+  <ol class="ac-list">
+    <li>Creates 10 sample <code>TradeEvent</code> objects</li>
+    <li>Filters them with composed predicates</li>
+    <li>Validates each passing trade, collecting errors</li>
+    <li>Prints a summary: X trades received, Y passed filters, Z passed validation, with details</li>
+  </ol>
+  <p><strong>This is your "imperative baseline."</strong> You'll rebuild this functionally with Vavr in Week 2.</p>
+</div>
+
+<!-- ============================================================== -->
+<!-- WEEK 2 -->
+<!-- ============================================================== -->
+<h2><span class="week-badge wb-2">Week 2</span> Vavr &amp; Railway-Oriented Programming</h2>
+<p>Still standalone Java, but now add Vavr as a dependency. Create a <code>week2/</code> Maven project with just the Vavr dependency. Reuse your domain model from Week 1.</p>
+
+<div class="exercise-card">
+  <h3>E7 · Try-Wrapping Risky Code <span class="difficulty diff-starter">Starter</span></h3>
+  <p><strong>Day 8 · ~45 min</strong></p>
+  <p><strong>Build:</strong> A <code>TradeEventParser</code> that parses JSON strings into <code>TradeEvent</code> objects. The parser can fail (bad JSON, missing fields). Wrap it with Vavr <code>Try</code>.</p>
+  <div class="file-hint">// 5 test inputs:
+String valid    = "{\"tradeId\":\"T-001\", \"assetClass\":\"IR\", ...}";
+String badJson  = "not json at all";
+String missing  = "{\"tradeId\":\"T-002\"}";  // missing required fields
+String nullVal  = null;
+String empty    = "";</div>
+  <p><strong>Acceptance Criteria:</strong></p>
+  <ul class="ac-list">
+    <li>☐ <code>TradeEventParser.parse(String)</code> returns <code>Try&lt;TradeEvent&gt;</code></li>
+    <li>☐ No try-catch blocks in your code — all exception handling via <code>Try</code></li>
+    <li>☐ Convert each <code>Try</code> to <code>Either&lt;String, TradeEvent&gt;</code> using <code>.toEither().mapLeft(Throwable::getMessage)</code></li>
+    <li>☐ All 5 inputs handled gracefully, success and failure paths printed</li>
+  </ul>
+</div>
+
+<div class="exercise-card">
+  <h3>E8 · Either Fundamentals Kata <span class="difficulty diff-starter">Starter</span></h3>
+  <p><strong>Day 9 · ~60 min</strong></p>
+  <p><strong>Build:</strong> A series of small functions, each returning <code>Either&lt;String, T&gt;</code>. Practice every core operation:</p>
+  <div class="file-hint">// Write each of these, test each independently:
+Either&lt;String, Integer&gt; parseInt(String s)           // Left if not a number
+Either&lt;String, Integer&gt; ensurePositive(Integer n)     // Left if <= 0
+Either&lt;String, Double&gt;  divide(Integer a, Integer b)  // Left if b == 0
+Either&lt;String, String&gt;  classify(Double result)       // "small"/"medium"/"large"
+
+// Then chain them:
+String input = "42";
+Either&lt;String, String&gt; result = parseInt(input)
+    .flatMap(n -&gt; ensurePositive(n))
+    .flatMap(n -&gt; divide(100, n))
+    .map(d -&gt; classify(d));</div>
+  <p>Test with inputs: "42", "-5", "0", "abc", "100". Trace the track for each.</p>
+  <p><strong>Acceptance Criteria:</strong></p>
+  <ul class="ac-list">
+    <li>☐ Each function returns Either, not throwing exceptions</li>
+    <li>☐ For each input, you can explain on paper which track it takes at each step</li>
+    <li>☐ You demonstrate <code>fold()</code> to collapse the final result into a single output string</li>
+    <li>☐ You demonstrate <code>mapLeft()</code> to enrich error messages with step info</li>
+  </ul>
+</div>
+
+<div class="exercise-card project-card">
+  <h3>🏗️ E9 · First Decision Pipeline <span class="difficulty diff-intermediate">Intermediate</span></h3>
+  <p><strong>Day 10 · ~90 min — THE MOST IMPORTANT EXERCISE</strong></p>
+  <p><strong>Build:</strong> A 4-step trade decision pipeline using <code>Either&lt;RejectionReason, TradeContext&gt;</code>:</p>
+  <div class="file-hint">Step 1: validateFormat(TradeEvent)    → Either&lt;RejectionReason, TradeEvent&gt;
+Step 2: checkDuplicate(TradeEvent)    → Either&lt;RejectionReason, TradeEvent&gt;
+Step 3: determineRegion(TradeEvent)   → Either&lt;RejectionReason, TradeContext&gt;
+Step 4: buildSubmission(TradeContext)  → Either&lt;RejectionReason, SubmissionMessage&gt;
+
+// The pipeline:
+public Either&lt;RejectionReason, SubmissionMessage&gt; process(TradeEvent event) {
+    return validateFormat(event)
+        .flatMap(this::checkDuplicate)
+        .flatMap(this::determineRegion)
+        .flatMap(this::buildSubmission);
+}</div>
+  <p><strong>Test with these scenarios:</strong></p>
+  <ul class="ac-list">
+    <li>Valid trade for EU region → Should produce an EMIR SubmissionMessage (Right track all the way)</li>
+    <li>Trade with blank ID → Should fail at Step 1 with <code>INVALID_FORMAT</code></li>
+    <li>Duplicate trade → Should fail at Step 2 with <code>DUPLICATE</code></li>
+    <li>Trade with unknown region "XX" → Should fail at Step 3 with <code>UNKNOWN_REGION</code></li>
+  </ul>
+  <p><strong>Acceptance Criteria:</strong></p>
+  <ul class="ac-list">
+    <li>☐ Pipeline uses only <code>flatMap</code> chaining — no if/else, no try/catch</li>
+    <li>☐ Failure at any step short-circuits remaining steps (proven by adding prints)</li>
+    <li>☐ <code>RejectionReason</code> carries both a code enum and a human-readable message</li>
+    <li>☐ You can draw the two-track diagram on paper for each test case</li>
+  </ul>
+</div>
+
+<div class="exercise-card">
+  <h3>E10 · Pipeline Enhancements <span class="difficulty diff-intermediate">Intermediate</span></h3>
+  <p><strong>Day 11 · ~60 min</strong></p>
+  <p><strong>Enhance E9's pipeline with:</strong></p>
+  <ul class="ac-list">
+    <li><code>peek()</code> — add audit logging after each successful step (print to console)</li>
+    <li><code>peekLeft()</code> — add rejection logging</li>
+    <li><code>mapLeft()</code> — enrich rejection reasons with timestamps and step names</li>
+    <li><code>filterOrElse()</code> — add a notional threshold check: reject if notional < 1000</li>
+  </ul>
+  <p><strong>Acceptance Criteria:</strong></p>
+  <ul class="ac-list">
+    <li>☐ Console shows audit trail: "Step 1 passed → Step 2 passed → ..." for success</li>
+    <li>☐ Console shows rejection point: "Step 1 passed → Step 2 REJECTED: DUPLICATE" for failure</li>
+    <li>☐ Rejection reasons include the step name where failure occurred</li>
+    <li>☐ Side effects (logging) don't alter the pipeline's return value</li>
+  </ul>
+</div>
+
+<div class="exercise-card">
+  <h3>E11 · Tuple Routing &amp; Pattern Matching <span class="difficulty diff-intermediate">Intermediate</span></h3>
+  <p><strong>Day 12 · ~60 min</strong></p>
+  <p><strong>Build:</strong> Extend your pipeline so that after <code>determineRegion</code>, the trade is routed to different sub-pipelines based on region. Use <code>Tuple2&lt;TradeContext, RegulatoryRegion&gt;</code> to carry both values, and Vavr <code>Match</code> to branch.</p>
+  <div class="file-hint">// After determining region, route:
+.flatMap(ctx -> Match(ctx.getRegion()).of(
+    Case($("EMIR"),  () -> buildEmirSubmission(ctx)),
+    Case($("CFTC"),  () -> buildCftcSubmission(ctx)),
+    Case($("ASIC"),  () -> buildAsicSubmission(ctx)),
+    Case($(),        () -> Either.left(new RejectionReason("UNSUPPORTED_REGION")))
+))</div>
+  <p><strong>Acceptance Criteria:</strong></p>
+  <ul class="ac-list">
+    <li>☐ Each region produces a differently-structured SubmissionMessage</li>
+    <li>☐ Unknown regions are handled by the default case without throwing</li>
+    <li>☐ At least one sub-pipeline uses <code>Tuple2</code> to carry extra context</li>
+  </ul>
+</div>
+
+<div class="exercise-card">
+  <h3>E12 · Pure Core, Imperative Shell <span class="difficulty diff-intermediate">Intermediate</span></h3>
+  <p><strong>Day 13 · ~60 min</strong></p>
+  <p><strong>Refactor E9-E11:</strong> Separate your code into two layers:</p>
+  <div class="file-hint">// PURE CORE — no I/O, no side effects, no mutable state
+DecisionPipeline.java  → all Either logic, stateless, testable with simple data
+
+// IMPERATIVE SHELL — all the messy I/O
+TradeEventListener.java → reads from console/file, calls pipeline, prints results</div>
+  <p><strong>Acceptance Criteria:</strong></p>
+  <ul class="ac-list">
+    <li>☐ <code>DecisionPipeline</code> has ZERO <code>System.out.println</code> calls (except via peek callbacks)</li>
+    <li>☐ <code>DecisionPipeline</code> takes no I/O dependencies — only data in, data out</li>
+    <li>☐ All console I/O lives in the shell layer</li>
+    <li>☐ You can unit-test <code>DecisionPipeline</code> without mocking any I/O</li>
+  </ul>
+</div>
+
+<div class="exercise-card milestone-card">
+  <h3>🏁 Milestone 2 · Pipeline Challenge <span class="difficulty diff-advanced">Advanced</span></h3>
+  <p><strong>Day 14 · ~90 min — TIMED CHALLENGE</strong></p>
+  <p><strong>From-scratch build (no looking at previous code):</strong> Given this spec, build a complete 6-step pipeline in 60 minutes:</p>
+  <div class="file-hint">Steps:
+1. parseEvent(String json)        → Either&lt;Rejection, TradeEvent&gt;
+2. validateMandatory(TradeEvent)   → Either&lt;Rejection, TradeEvent&gt;
+3. checkNotionalThreshold(TE)      → Either&lt;Rejection, TradeEvent&gt;
+4. determineRegions(TradeEvent)    → Either&lt;Rejection, TradeContext&gt;  // can be MULTIPLE regions
+5. buildSubmissions(TradeContext)   → Either&lt;Rejection, List&lt;SubmissionMessage&gt;&gt;
+6. audit(List&lt;SubmissionMessage&gt;)  → Either&lt;Rejection, List&lt;SubmissionMessage&gt;&gt;
+
+Test: 5 different trades, each hitting a different failure point (or succeeding).</div>
+  <p><strong>Bonus:</strong> Debug challenge — given a broken pipeline with 3 bugs, find and fix them. <em>(Ask me with <code>/teach debug-challenge</code> and I'll generate one.)</em></p>
+</div>
+
+<!-- ============================================================== -->
+<!-- WEEK 3 -->
+<!-- ============================================================== -->
+<h2><span class="week-badge wb-3">Week 3</span> Spring Boot, Profiles &amp; Messaging</h2>
+<p><strong>Create your Spring Boot project this week.</strong> Use Spring Initializr or <code>mvn archetype:generate</code>. Add: Spring Boot Starter, ActiveMQ, Jackson, Vavr, Lombok. Copy your domain model from Week 2.</p>
+
+<div class="exercise-card project-card">
+  <h3>🏗️ E13 · Spring-Wired Pipeline <span class="difficulty diff-intermediate">Intermediate</span></h3>
+  <p><strong>Day 15 · ~90 min</strong></p>
+  <p><strong>Build:</strong> Take your Week 2 decision pipeline and wire it into Spring Boot:</p>
+  <ul class="ac-list">
+    <li>Each pipeline step becomes a <code>@Component</code></li>
+    <li><code>DecisionPipeline</code> becomes a <code>@Service</code> with constructor-injected steps</li>
+    <li>Use <code>@RequiredArgsConstructor</code> (Lombok) — no <code>@Autowired</code> fields</li>
+    <li>Write a <code>CommandLineRunner</code> that processes sample trades on startup</li>
+  </ul>
+  <p><strong>Acceptance Criteria:</strong></p>
+  <ul class="ac-list">
+    <li>☐ <code>mvn spring-boot:run</code> starts the app and processes trades</li>
+    <li>☐ All injection is via constructors, not field injection</li>
+    <li>☐ Pipeline steps can be swapped by defining alternative beans</li>
+  </ul>
+</div>
+
+<div class="exercise-card project-card">
+  <h3>🏗️ E14 · Two Clients, Two Profiles <span class="difficulty diff-intermediate">Intermediate</span></h3>
+  <p><strong>Day 16 · ~90 min</strong></p>
+  <p><strong>Build:</strong> Extend E13 to support two bank clients with different behavior:</p>
+  <div class="file-hint">Profile "alpha-bank":
+  - Reports to: EMIR, ASIC
+  - Notional threshold: 5000
+  - Includes FX forwards: YES
+
+Profile "beta-bank":
+  - Reports to: CFTC
+  - Notional threshold: 10000
+  - Includes FX forwards: NO</div>
+  <p>Create: <code>application-alpha-bank.yml</code>, <code>application-beta-bank.yml</code>, profile-specific step beans.</p>
+  <p><strong>Acceptance Criteria:</strong></p>
+  <ul class="ac-list">
+    <li>☐ Running with <code>--spring.profiles.active=alpha-bank</code> uses alpha rules</li>
+    <li>☐ Running with <code>--spring.profiles.active=beta-bank</code> uses beta rules</li>
+    <li>☐ Same trade event produces different results under different profiles</li>
+    <li>☐ At least one custom <code>@AlphaBankProfile</code> meta-annotation exists</li>
+  </ul>
+</div>
+
+<div class="exercise-card">
+  <h3>E15 · Type-Safe YAML Config <span class="difficulty diff-intermediate">Intermediate</span></h3>
+  <p><strong>Day 17 · ~60 min</strong></p>
+  <p><strong>Build:</strong> A <code>@ConfigurationProperties</code> class that binds this YAML structure:</p>
+  <div class="file-hint">reporting:
+  client-name: "Alpha Bank"
+  regions:
+    - name: EMIR
+      enabled: true
+      notional-threshold: 5000
+      asset-classes: [IR, FX, CR]
+    - name: ASIC
+      enabled: true
+      notional-threshold: 10000
+      asset-classes: [IR]
+  defaults:
+    include-fx-forwards: true
+    timeout-ms: 3000</div>
+  <p>Inject this config into your pipeline steps. The steps should read thresholds from config, not hard-code them.</p>
+  <p><strong>Acceptance Criteria:</strong></p>
+  <ul class="ac-list">
+    <li>☐ <code>ReportingConfig</code> class with nested <code>RegionConfig</code> and <code>DefaultsConfig</code></li>
+    <li>☐ All pipeline thresholds come from YAML, not hard-coded values</li>
+    <li>☐ Changing YAML values changes pipeline behavior without recompiling</li>
+  </ul>
+</div>
+
+<div class="exercise-card">
+  <h3>E16 · JMS Message Receiver <span class="difficulty diff-starter">Starter</span></h3>
+  <p><strong>Day 18-19 · ~120 min</strong></p>
+  <p><strong>Build:</strong> Add JMS messaging to your Spring Boot app using an embedded ActiveMQ broker:</p>
+  <ul class="ac-list">
+    <li>A <code>@JmsListener</code> that receives JSON trade events from queue <code>trade.events.inbound</code></li>
+    <li>Jackson deserialization of the JSON into <code>TradeEvent</code></li>
+    <li>Passes the trade through your decision pipeline</li>
+    <li>Sends successful submissions to queue <code>trade.submissions.outbound</code> via <code>JmsTemplate</code></li>
+    <li>A test <code>CommandLineRunner</code> that sends 5 sample trade JSONs to the inbound queue on startup</li>
+  </ul>
+  <p><strong>Acceptance Criteria:</strong></p>
+  <ul class="ac-list">
+    <li>☐ App starts, auto-sends 5 trades, processes them through the pipeline, and outputs results</li>
+    <li>☐ Console shows the full flow: received → processed → sent or rejected</li>
+    <li>☐ Uses embedded ActiveMQ (no external broker needed)</li>
+    <li>☐ Message converter is configured for JSON ↔ Java object mapping</li>
+  </ul>
+</div>
+
+<div class="exercise-card">
+  <h3>E17 · Jackson Polymorphic Deserialization <span class="difficulty diff-intermediate">Intermediate</span></h3>
+  <p><strong>Day 20 · ~60 min</strong></p>
+  <p><strong>Build:</strong> Different trade event types (NewTrade, AmendTrade, CancelTrade) arriving as JSON with a <code>"eventType"</code> discriminator field. Use <code>@JsonTypeInfo</code> and <code>@JsonSubTypes</code> to deserialize them into the correct Java subclass automatically.</p>
+  <p><strong>Acceptance Criteria:</strong></p>
+  <ul class="ac-list">
+    <li>☐ Single <code>ObjectMapper.readValue()</code> call produces the correct subclass</li>
+    <li>☐ <code>NewTrade</code>, <code>AmendTrade</code>, <code>CancelTrade</code> all use <code>@Value</code> (Lombok) — immutable</li>
+    <li>☐ Pipeline step logic branches correctly based on event type</li>
+  </ul>
+</div>
+
+<div class="exercise-card milestone-card">
+  <h3>🏁 Milestone 3 · Spring Integration Test <span class="difficulty diff-advanced">Advanced</span></h3>
+  <p><strong>Day 21 · ~120 min</strong></p>
+  <p><strong>Combine E13–E17</strong> into a fully working Spring Boot app and verify end-to-end:</p>
+  <ol class="ac-list">
+    <li>Start with <code>--spring.profiles.active=alpha-bank</code></li>
+    <li>Send 8 JSON trade events (mix of valid, invalid, different types) to the inbound queue</li>
+    <li>Verify: correct trades produce submissions, invalid trades are rejected with reasons</li>
+    <li>Restart with <code>--spring.profiles.active=beta-bank</code> — same trades, different results</li>
+  </ol>
+  <p><strong>Write a brief test report</strong> (text file) documenting: input → expected → actual for each trade under each profile.</p>
+</div>
+
+<!-- ============================================================== -->
+<!-- WEEK 4 -->
+<!-- ============================================================== -->
+<h2><span class="week-badge wb-4">Week 4</span> Design Patterns &amp; Lombok</h2>
+<p>Refactor your Week 3 project to use design patterns. Each exercise modifies the same codebase — your app gets cleaner and more Exgester-like every day.</p>
+
+<div class="exercise-card project-card">
+  <h3>🏗️ E18 · Strategy: Pluggable Reportability Rules <span class="difficulty diff-intermediate">Intermediate</span></h3>
+  <p><strong>Day 22 · ~90 min</strong></p>
+  <p><strong>Refactor:</strong> Extract reportability logic into a <code>ReportabilityStrategy</code> interface. Create 3 implementations: <code>EmirReportability</code>, <code>CftcReportability</code>, <code>AsicReportability</code>. Each reads its rules from YAML config. Inject the correct one via <code>@Profile</code>.</p>
+  <p><strong>Acceptance Criteria:</strong></p>
+  <ul class="ac-list">
+    <li>☐ <code>ReportabilityStrategy</code> has a single method: <code>Either&lt;Rejection, Boolean&gt; isReportable(TradeEvent)</code></li>
+    <li>☐ Pipeline doesn't know which strategy it's using — just calls the interface</li>
+    <li>☐ Adding a new regulatory region = new class + new profile YAML, zero changes to existing code</li>
+  </ul>
+</div>
+
+<div class="exercise-card project-card">
+  <h3>🏗️ E19 · Factory: Submission Message Construction <span class="difficulty diff-intermediate">Intermediate</span></h3>
+  <p><strong>Day 23 · ~60 min</strong></p>
+  <p><strong>Build:</strong> A <code>SubmissionMessageFactory</code> that produces the right message type per region. Each region's message has different required fields:</p>
+  <div class="file-hint">EmirSubmission  → needs: UTI, LEI, maturityDate, reportingSide
+CftcSubmission  → needs: USI, LEI, executionTimestamp, blockTradeIndicator
+AsicSubmission  → needs: UTI, LEI, australianBusinessNumber</div>
+  <p><strong>Acceptance Criteria:</strong></p>
+  <ul class="ac-list">
+    <li>☐ Factory is a Spring <code>@Component</code> — no <code>new SubmissionMessage()</code> calls outside the factory</li>
+    <li>☐ Each message type uses Lombok <code>@Builder</code> + <code>@Value</code></li>
+    <li>☐ Pipeline calls <code>factory.create(region, context)</code> — doesn't know about subtypes</li>
+  </ul>
+</div>
+
+<div class="exercise-card">
+  <h3>E20 · Template Method: Abstract Reporting Flow <span class="difficulty diff-intermediate">Intermediate</span></h3>
+  <p><strong>Day 24 · ~60 min</strong></p>
+  <p><strong>Refactor:</strong> Create <code>AbstractReportingFlow</code> with these template steps:</p>
+  <div class="file-hint">final process(TradeEvent):
+  1. validate(event)           ← common, not overridable
+  2. enrich(event)             ← ABSTRACT — client-specific enrichment
+  3. checkReportability(event) ← uses injected Strategy
+  4. buildMessage(context)     ← ABSTRACT — client-specific formatting
+  5. auditLog(message)         ← common, not overridable</div>
+  <p>Create <code>AlphaBankReportingFlow</code> and <code>BetaBankReportingFlow</code> subclasses.</p>
+  <p><strong>Acceptance Criteria:</strong></p>
+  <ul class="ac-list">
+    <li>☐ <code>process()</code> is <code>final</code> — subclasses can't change the algorithm skeleton</li>
+    <li>☐ Each bank overrides only <code>enrich()</code> and <code>buildMessage()</code></li>
+    <li>☐ Common steps (validate, audit) are shared and tested once</li>
+  </ul>
+</div>
+
+<div class="exercise-card">
+  <h3>E21 · Chain of Responsibility: Dynamic Decision Steps <span class="difficulty diff-advanced">Advanced</span></h3>
+  <p><strong>Day 25 · ~60 min</strong></p>
+  <p><strong>Build:</strong> Make your pipeline steps configurable as a chain. Create a <code>DecisionHandler</code> interface and a <code>DecisionChain</code> that accepts a <code>List&lt;DecisionHandler&gt;</code> injected by Spring. Each handler can: pass (Right), reject (Left), or enrich (Right with modified context).</p>
+  <p>Configure different chains per profile in YAML — alpha-bank gets handlers [A, B, C, D], beta-bank gets [A, C, E].</p>
+  <p><strong>Acceptance Criteria:</strong></p>
+  <ul class="ac-list">
+    <li>☐ Chain processes handlers in order using <code>Either.flatMap</code> reduction</li>
+    <li>☐ Changing handler order or adding/removing handlers requires only YAML changes</li>
+    <li>☐ Each handler is independently unit-testable</li>
+  </ul>
+</div>
+
+<div class="exercise-card">
+  <h3>E22 · Composite Rules &amp; Lombok Conversion <span class="difficulty diff-intermediate">Intermediate</span></h3>
+  <p><strong>Day 26-27 · ~120 min</strong></p>
+  <p><strong>Build:</strong> Composite reportability rules + convert entire codebase to Lombok:</p>
+  <ol class="ac-list">
+    <li>Create <code>AllOfRule</code> and <code>AnyOfRule</code> composites that combine <code>ReportabilityRule</code> instances</li>
+    <li>Convert ALL domain model classes to Lombok: <code>@Value</code> (immutable), <code>@Builder</code>, <code>@Slf4j</code></li>
+    <li>Replace all manual constructors with <code>@RequiredArgsConstructor</code></li>
+    <li>Verify the app still works identically after the conversion</li>
+  </ol>
+  <p><strong>Acceptance Criteria:</strong></p>
+  <ul class="ac-list">
+    <li>☐ <code>emirRules = AllOf(notionalAbove5000, assetClassAllowed, counterpartyHasLei)</code></li>
+    <li>☐ Rules compose into trees: <code>AnyOf(emirRules, cftcRules)</code></li>
+    <li>☐ Zero hand-written getters, constructors, equals/hashCode, or toString</li>
+    <li>☐ App passes all existing manual tests after Lombok conversion</li>
+  </ul>
+</div>
+
+<div class="exercise-card milestone-card">
+  <h3>🏁 Milestone 4 · Pattern Recognition &amp; Refactoring <span class="difficulty diff-advanced">Advanced</span></h3>
+  <p><strong>Day 28 · ~90 min</strong></p>
+  <p><strong>Challenge 1 — Identify:</strong> Ask me (<code>/teach pattern-recognition</code>) for 6 code snippets. Identify which pattern each uses.</p>
+  <p><strong>Challenge 2 — Refactor:</strong> Take a provided 100-line imperative trade processor and refactor it to use Strategy + Factory + Chain of Responsibility. <em>(Ask me with <code>/teach refactoring-challenge</code>)</em></p>
+</div>
+
+<!-- ============================================================== -->
+<!-- WEEK 5 -->
+<!-- ============================================================== -->
+<h2><span class="week-badge wb-5">Week 5</span> Testing, Build &amp; Capstone</h2>
+<p>Add tests to your project. Configure build quality. Then build the final capstone.</p>
+
+<div class="exercise-card">
+  <h3>E23 · JUnit 5 Pipeline Tests <span class="difficulty diff-intermediate">Intermediate</span></h3>
+  <p><strong>Day 29 · ~90 min</strong></p>
+  <p><strong>Write tests for your pipeline:</strong></p>
+  <ul class="ac-list">
+    <li>3 unit tests per pipeline step (success case, boundary case, failure case)</li>
+    <li>Use <code>@ParameterizedTest</code> with <code>@CsvSource</code> for data-driven validation tests</li>
+    <li>Use <code>@Nested</code> to group: <code>WhenTradeIsValid</code>, <code>WhenTradeIsDuplicate</code>, etc.</li>
+    <li>Assert on Either: <code>assertThat(result.isRight()).isTrue()</code></li>
+  </ul>
+  <p><strong>Acceptance Criteria:</strong></p>
+  <ul class="ac-list">
+    <li>☐ At least 15 test methods across all pipeline steps</li>
+    <li>☐ Tests are organized with <code>@Nested</code> classes by scenario</li>
+    <li>☐ At least one <code>@ParameterizedTest</code> tests 5+ inputs</li>
+    <li>☐ <code>mvn test</code> passes — all green</li>
+  </ul>
+</div>
+
+<div class="exercise-card">
+  <h3>E24 · Cucumber BDD Feature Files <span class="difficulty diff-intermediate">Intermediate</span></h3>
+  <p><strong>Day 30 · ~90 min</strong></p>
+  <p><strong>Write 2 Cucumber feature files:</strong></p>
+  <div class="file-hint"># features/trade_reporting.feature
+Feature: Trade Reporting Decision Engine
+
+  Scenario: Valid trade produces EMIR submission
+    Given a trade event with id "T-001" for region "EU"
+    And the trade has asset class "IR" and notional 50000
+    When the decision engine processes the trade
+    Then a submission message should be created for "EMIR"
+    And the submission should contain trade id "T-001"
+
+  Scenario: Invalid trade is rejected
+    Given a trade event with id "" for region "EU"
+    When the decision engine processes the trade
+    Then the trade should be rejected with reason "INVALID_FORMAT"
+
+# features/multi_tenant.feature
+Feature: Multi-Tenant Behavior
+  ...</div>
+  <p>Implement step definitions backed by your real Spring Boot pipeline.</p>
+  <p><strong>Acceptance Criteria:</strong></p>
+  <ul class="ac-list">
+    <li>☐ <code>@CucumberContextConfiguration</code> + <code>@SpringBootTest</code> wires Spring context</li>
+    <li>☐ At least 6 scenarios across the 2 feature files</li>
+    <li>☐ <code>mvn test</code> runs both JUnit and Cucumber tests</li>
+  </ul>
+</div>
+
+<div class="exercise-card">
+  <h3>E25 · Scenario Outlines &amp; Data Tables <span class="difficulty diff-intermediate">Intermediate</span></h3>
+  <p><strong>Day 31 · ~60 min</strong></p>
+  <p><strong>Extend E24 with data-driven scenarios:</strong></p>
+  <div class="file-hint">Scenario Outline: Trade reportability by region and asset class
+  Given a trade for region "&lt;region&gt;" with asset class "&lt;asset&gt;" and notional &lt;notional&gt;
+  When processed under profile "&lt;profile&gt;"
+  Then the outcome should be "&lt;outcome&gt;"
+
+  Examples:
+    | region | asset | notional | profile    | outcome   |
+    | EU     | IR    | 50000    | alpha-bank | REPORTED  |
+    | US     | FX    | 50000    | alpha-bank | REJECTED  |
+    | AU     | IR    | 3000     | alpha-bank | REJECTED  |
+    | US     | CR    | 50000    | beta-bank  | REPORTED  |</div>
+  <p><strong>Acceptance Criteria:</strong></p>
+  <ul class="ac-list">
+    <li>☐ Single scenario outline tests 8+ combinations</li>
+    <li>☐ State shared between steps via a Spring-managed context object (not static fields)</li>
+    <li>☐ All combinations pass when run with <code>mvn test</code></li>
+  </ul>
+</div>
+
+<div class="exercise-card">
+  <h3>E26 · Maven Build Quality <span class="difficulty diff-starter">Starter</span></h3>
+  <p><strong>Day 32 · ~60 min</strong></p>
+  <p><strong>Configure:</strong></p>
+  <ul class="ac-list">
+    <li>JaCoCo coverage with 70% line coverage threshold</li>
+    <li>Run <code>mvn verify</code> — does it pass the coverage check?</li>
+    <li>Read the JaCoCo HTML report — find which classes have low coverage</li>
+    <li>Add tests until coverage passes</li>
+    <li><strong>Bonus:</strong> Add Checkstyle with Google Java Style and fix any violations</li>
+  </ul>
+  <p><strong>Acceptance Criteria:</strong></p>
+  <ul class="ac-list">
+    <li>☐ <code>mvn verify</code> passes with ≥70% coverage</li>
+    <li>☐ You can locate and open the JaCoCo HTML report</li>
+    <li>☐ You can explain which classes are under-covered and why</li>
+  </ul>
+</div>
+
+<div class="exercise-card project-card milestone-card">
+  <h3>🏆 CAPSTONE · Mini Exgester <span class="difficulty diff-advanced">Advanced</span></h3>
+  <p><strong>Days 33-35 · ~4-5 hours total</strong></p>
+  <p><strong>Build a clean-room mini trade reporting engine</strong> that combines every concept from the course. Start a fresh Spring Boot project (or polish your existing one) with this exact spec:</p>
+
+  <h4>Architecture Requirements</h4>
+  <ul class="ac-list">
+    <li>☐ Trade events arrive via JMS queue <code>trade.events.inbound</code></li>
+    <li>☐ Jackson deserializes JSON into immutable Lombok <code>@Value</code> objects</li>
+    <li>☐ Polymorphic deserialization: NewTrade, AmendTrade, CancelTrade</li>
+    <li>☐ Railway-oriented decision pipeline using Vavr <code>Either&lt;Rejection, TradeContext&gt;</code></li>
+    <li>☐ Pipeline has 5+ steps chained with <code>flatMap</code></li>
+    <li>☐ <code>peek()</code> / <code>peekLeft()</code> for audit logging</li>
+  </ul>
+
+  <h4>Design Pattern Requirements</h4>
+  <ul class="ac-list">
+    <li>☐ <strong>Strategy</strong> — <code>ReportabilityStrategy</code> with EMIR + CFTC implementations</li>
+    <li>☐ <strong>Factory</strong> — <code>SubmissionMessageFactory</code> producing region-specific messages</li>
+    <li>☐ <strong>Template Method</strong> — <code>AbstractReportingFlow</code> with 2 bank-specific subclasses</li>
+    <li>☐ <strong>Chain of Responsibility</strong> — configurable decision handler chain</li>
+    <li>☐ <strong>Composite</strong> — composite reportability rules (AND/OR)</li>
+    <li>☐ <strong>Builder</strong> — Lombok <code>@Builder</code> for all submission message types</li>
+  </ul>
+
+  <h4>Multi-Tenant Requirements</h4>
+  <ul class="ac-list">
+    <li>☐ 2 Spring profiles: <code>alpha-bank</code> and <code>beta-bank</code></li>
+    <li>☐ Profile-specific YAML config with different regions, thresholds, rules</li>
+    <li>☐ Custom <code>@AlphaBankProfile</code> meta-annotation</li>
+    <li>☐ Same trade, different profiles → different outcomes</li>
+  </ul>
+
+  <h4>Testing Requirements</h4>
+  <ul class="ac-list">
+    <li>☐ JUnit 5 unit tests for each pipeline step (15+ tests)</li>
+    <li>☐ Cucumber BDD feature files with 8+ scenarios</li>
+    <li>☐ At least 1 Scenario Outline with 4+ data rows</li>
+    <li>☐ JaCoCo coverage ≥ 70%</li>
+    <li>☐ <code>mvn verify</code> passes clean</li>
+  </ul>
+
+  <h4>Deliverables</h4>
+  <ul class="ac-list">
+    <li>☐ Working codebase that builds and runs</li>
+    <li>☐ A brief README.md explaining the architecture</li>
+    <li>☐ Architecture diagram (hand-drawn or text-based is fine)</li>
+  </ul>
+</div>
+
+<hr>
+
+<div class="ask-teacher">
+  <strong>Stuck on an exercise?</strong> Tell me <code>/teach</code> + the exercise number (e.g. "help with E9") and I'll guide you without spoiling the answer.
+  <br>Want a challenge generated for you? Ask for <code>/teach debug-challenge</code> or <code>/teach refactoring-challenge</code>.
+</div>
+
+<nav class="lesson-nav">
+  <a href="curriculum.html">← Back to Curriculum</a>
+  <a href="prompt-library.html">Prompt Library →</a>
+</nav>
+
+</body>
+</html>

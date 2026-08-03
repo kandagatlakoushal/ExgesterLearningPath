@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exgester Learning — Prompt Library</title>
+  <link rel="stylesheet" href="../assets/shared.css">
+  <style>
+    .prompt-card {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin: 1rem 0;
+    }
+    .prompt-card h3 {
+      margin-top: 0;
+      font-size: 1rem;
+    }
+    .prompt-text {
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      background: #1e1e2e;
+      color: #cdd6f4;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      margin-top: 0.5rem;
+      white-space: pre-wrap;
+    }
+    .category-header {
+      font-family: var(--font-ui);
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--accent);
+      margin-top: 2rem;
+      padding-bottom: 0.3rem;
+      border-bottom: 2px solid var(--accent);
+    }
+  </style>
+</head>
+<body>
+
+<h1>🎯 Prompt Library — Exgester Learning Path</h1>
+
+<div class="lesson-meta">
+  <span>📖 Reference Document</span>
+  <span>Copy-paste these prompts to start focused learning sessions</span>
+</div>
+
+<p>These prompts are designed to work with the <code>/teach</code> skill. Copy any prompt below and paste it into your chat to start a targeted session.</p>
+
+<!-- ========== SESSION STARTERS ========== -->
+<div class="category-header">📚 Session Starters</div>
+
+<div class="prompt-card">
+  <h3>Continue Where I Left Off</h3>
+  <div class="prompt-text">/teach
+
+Continue my Exgester learning path. Check my learning records and deliver the next lesson.</div>
+</div>
+
+<div class="prompt-card">
+  <h3>Review & Quiz Me</h3>
+  <div class="prompt-text">/teach
+
+Quiz me on what I've learned so far. Use spaced recall — focus on topics from 3+ days ago. Interleave different subjects.</div>
+</div>
+
+<div class="prompt-card">
+  <h3>Quick 30-Minute Session</h3>
+  <div class="prompt-text">/teach
+
+I only have 30 minutes. Give me a focused micro-lesson on the most important thing I should learn next, with one hands-on exercise.</div>
+</div>
+
+<!-- ========== VAVR & ROP ========== -->
+<div class="category-header">🚂 Vavr & Railway-Oriented Programming</div>
+
+<div class="prompt-card">
+  <h3>Either from Scratch</h3>
+  <div class="prompt-text">/teach
+
+Teach me Vavr Either<L,R> from the ground up. I want to understand the two-track mental model, map vs flatMap, and how to build a simple 3-step decision pipeline. Include a hands-on exercise.</div>
+</div>
+
+<div class="prompt-card">
+  <h3>Pipeline Debugging</h3>
+  <div class="prompt-text">/teach
+
+Give me a broken Either pipeline (6+ steps) with 2-3 subtle bugs. I want to practice debugging ROP code — finding where the wrong track is taken, where map should be flatMap, etc.</div>
+</div>
+
+<div class="prompt-card">
+  <h3>Advanced Either Operations</h3>
+  <div class="prompt-text">/teach
+
+Teach me the advanced Either operations I'll need in Exgester: mapLeft for error transformation, peek for side-effect logging, filterOrElse for conditional rejection, and how to compose multiple Either-returning functions into a clean pipeline.</div>
+</div>
+
+<div class="prompt-card">
+  <h3>Try and Option</h3>
+  <div class="prompt-text">/teach
+
+Teach me Vavr Try and Option. Show me how they bridge imperative exception-throwing code into functional pipelines, and how to convert between Try → Either and Option → Either.</div>
+</div>
+
+<!-- ========== JAVA FUNDAMENTALS ========== -->
+<div class="category-header">☕ Java Fundamentals</div>
+
+<div class="prompt-card">
+  <h3>Generics Deep Dive</h3>
+  <div class="prompt-text">/teach
+
+Teach me Java generics at the level needed to read Exgester. Cover bounded types, wildcards (? extends, ? super), type erasure, and give me exercises writing generic interfaces like DecisionStep<I, O>.</div>
+</div>
+
+<div class="prompt-card">
+  <h3>Functional Interfaces & Lambdas</h3>
+  <div class="prompt-text">/teach
+
+Teach me Java functional interfaces and lambdas. I need to understand Function, Predicate, Consumer, Supplier, BiFunction, and method references well enough to read and write Exgester's functional-style code.</div>
+</div>
+
+<div class="prompt-card">
+  <h3>Streams Mastery</h3>
+  <div class="prompt-text">/teach
+
+Give me a streams workout. I want exercises that practice map, filter, flatMap, collect, reduce, and groupingBy using trade event data. Focus on the operations I'll see in Exgester.</div>
+</div>
+
+<!-- ========== SPRING BOOT ========== -->
+<div class="category-header">🌱 Spring Boot</div>
+
+<div class="prompt-card">
+  <h3>Spring Profiles for Multi-Tenant</h3>
+  <div class="prompt-text">/teach
+
+Teach me how Exgester uses Spring @Profile to serve multiple banks from one codebase. Cover profile activation, profile-specific beans, custom profile annotations, and profile-specific YAML. Include a hands-on exercise where I create two client profiles with different behavior.</div>
+</div>
+
+<div class="prompt-card">
+  <h3>Constructor Injection & DI</h3>
+  <div class="prompt-text">/teach
+
+Teach me Spring dependency injection the way Exgester uses it. Focus on constructor injection with @RequiredArgsConstructor, @Configuration classes, @Bean methods, and how pipeline steps are wired together as Spring beans.</div>
+</div>
+
+<div class="prompt-card">
+  <h3>YAML Configuration</h3>
+  <div class="prompt-text">/teach
+
+Teach me Spring YAML configuration. I need to understand hierarchical config, @ConfigurationProperties, profile-specific YAML (application-{profile}.yml), and type-safe config binding. Exercise: model a regulatory config in YAML.</div>
+</div>
+
+<!-- ========== MESSAGING ========== -->
+<div class="category-header">📨 JMS & Messaging</div>
+
+<div class="prompt-card">
+  <h3>JMS Fundamentals</h3>
+  <div class="prompt-text">/teach
+
+Teach me JMS concepts as they apply to Exgester: Queue vs Topic, message types, acknowledgment modes, dead-letter queues. Then show me how Spring JMS works with @JmsListener and JmsTemplate.</div>
+</div>
+
+<div class="prompt-card">
+  <h3>End-to-End Message Flow</h3>
+  <div class="prompt-text">/teach
+
+Walk me through building a mini app that receives a JSON trade event from a JMS queue, processes it through a Vavr Either pipeline, and sends the result to an output queue. I want to understand the full message flow.</div>
+</div>
+
+<!-- ========== DESIGN PATTERNS ========== -->
+<div class="category-header">🏗️ Design Patterns</div>
+
+<div class="prompt-card">
+  <h3>Strategy + Spring Profiles</h3>
+  <div class="prompt-text">/teach
+
+Show me how the Strategy pattern combines with Spring Profiles in Exgester. I want to build a ReportabilityStrategy interface with EMIR and CFTC implementations, injected via profiles.</div>
+</div>
+
+<div class="prompt-card">
+  <h3>Pattern Recognition Exercise</h3>
+  <div class="prompt-text">/teach
+
+Give me code snippets that use Strategy, Factory, Template Method, Chain of Responsibility, Composite, and Builder patterns. I need to identify which pattern each snippet uses and explain why.</div>
+</div>
+
+<!-- ========== TESTING ========== -->
+<div class="category-header">🧪 Testing</div>
+
+<div class="prompt-card">
+  <h3>Cucumber BDD for Trade Reporting</h3>
+  <div class="prompt-text">/teach
+
+Teach me Cucumber BDD testing for trade reporting scenarios. Show me how to write Gherkin feature files like "Given a trade event for ANZ, When the decision engine runs, Then an EMIR submission should be created." Include step definition implementation.</div>
+</div>
+
+<div class="prompt-card">
+  <h3>Testing Either Pipelines</h3>
+  <div class="prompt-text">/teach
+
+Teach me how to unit test Vavr Either decision pipelines with JUnit 5. Cover: asserting isRight/isLeft, extracting values, testing individual pipeline steps, and testing the full pipeline end-to-end.</div>
+</div>
+
+<!-- ========== DOMAIN ========== -->
+<div class="category-header">🏛️ Regulatory Domain</div>
+
+<div class="prompt-card">
+  <h3>Trade Reporting Crash Course</h3>
+  <div class="prompt-text">/teach
+
+Give me a crash course on regulatory trade reporting — just enough domain knowledge to understand why Exgester exists. Cover EMIR, FCA, ASIC, CFTC at a high level: what they require, key identifiers (LEI, UTI, UPI), and the lifecycle of a reported trade.</div>
+</div>
+
+<!-- ========== CAPSTONE ========== -->
+<div class="category-header">🏆 Capstone</div>
+
+<div class="prompt-card">
+  <h3>Build Mini Exgester</h3>
+  <div class="prompt-text">/teach
+
+I'm ready for the capstone project. Guide me through building a mini trade reporting engine that combines all the skills: JMS messaging, Either pipelines, Spring profiles for multi-tenant, Strategy pattern for regulatory rules, Cucumber tests, and Maven build. Walk me through it step by step.</div>
+</div>
+
+<div class="prompt-card">
+  <h3>Code Review Practice</h3>
+  <div class="prompt-text">/teach
+
+Give me a code review exercise. Show me a trade reporting pipeline implementation with 5-8 code quality issues (pattern violations, missing error handling, side effects in wrong places, etc). I want to find and fix them all.</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spring Profiles — Quick Reference</title>
+  <link rel="stylesheet" href="../assets/shared.css">
+</head>
+<body>
+
+<h1>Spring Profiles for Multi-Tenant Apps — Quick Reference</h1>
+
+<div class="lesson-meta">
+  <span>📖 Reference Document</span>
+  <span>🔗 <a href="https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#features.profiles">Spring Boot Profiles Docs</a></span>
+</div>
+
+<h2>Activating Profiles</h2>
+<pre><code><span class="cmt"># Command line</span>
+java -jar exgester.jar --spring.profiles.active=anz,emir
+
+<span class="cmt"># application.yml</span>
+spring:
+  profiles:
+    active: anz
+
+<span class="cmt"># Environment variable</span>
+SPRING_PROFILES_ACTIVE=anz,emir</code></pre>
+
+<h2>Profile-Specific Beans</h2>
+<pre><code><span class="ann">@Service</span>
+<span class="ann">@Profile("anz")</span>
+<span class="kw">public class</span> <span class="type">AnzReportabilityStrategy</span> <span class="kw">implements</span> <span class="type">ReportabilityStrategy</span> {
+    <span class="cmt">// ANZ-specific reporting rules</span>
+}
+
+<span class="ann">@Service</span>
+<span class="ann">@Profile("wbc")</span>
+<span class="kw">public class</span> <span class="type">WbcReportabilityStrategy</span> <span class="kw">implements</span> <span class="type">ReportabilityStrategy</span> {
+    <span class="cmt">// WBC-specific reporting rules</span>
+}
+
+<span class="ann">@Service</span>
+<span class="ann">@Profile("default")</span>
+<span class="kw">public class</span> <span class="type">DefaultReportabilityStrategy</span> <span class="kw">implements</span> <span class="type">ReportabilityStrategy</span> {
+    <span class="cmt">// Fallback for unmatched profiles</span>
+}</code></pre>
+
+<h2>Custom Profile Annotations</h2>
+<pre><code><span class="cmt">// Exgester pattern: custom annotations for readability</span>
+<span class="ann">@Target(ElementType.TYPE)</span>
+<span class="ann">@Retention(RetentionPolicy.RUNTIME)</span>
+<span class="ann">@Profile("anz")</span>
+<span class="kw">public @interface</span> <span class="type">AnzProfile</span> { }
+
+<span class="cmt">// Usage — cleaner than @Profile("anz")</span>
+<span class="ann">@Service</span>
+<span class="ann">@AnzProfile</span>
+<span class="kw">public class</span> <span class="type">AnzTradeFilter</span> { ... }</code></pre>
+
+<h2>Profile-Specific YAML Configuration</h2>
+<pre><code><span class="cmt"># application.yml (shared config)</span>
+reporting:
+  max-retry: 3
+  timeout-ms: 5000
+
+<span class="cmt"># application-anz.yml (ANZ-specific overrides)</span>
+reporting:
+  regions:
+    - ASIC
+    - EMIR
+  anz-specific:
+    include-fx-forwards: true
+
+<span class="cmt"># application-wbc.yml (WBC-specific overrides)</span>
+reporting:
+  regions:
+    - ASIC
+  wbc-specific:
+    legacy-format: true</code></pre>
+
+<h2>Binding YAML to Java</h2>
+<pre><code><span class="ann">@ConfigurationProperties(prefix = "reporting")</span>
+<span class="ann">@Data</span> <span class="cmt">// Lombok</span>
+<span class="kw">public class</span> <span class="type">ReportingConfig</span> {
+    <span class="kw">private int</span> maxRetry;
+    <span class="kw">private int</span> timeoutMs;
+    <span class="kw">private</span> <span class="type">List</span>&lt;<span class="type">String</span>&gt; regions;
+}</code></pre>
+
+<h2>Profile Operators</h2>
+<table>
+  <tr><th>Expression</th><th>Meaning</th></tr>
+  <tr><td><code>@Profile("anz")</code></td><td>Active only when "anz" is active</td></tr>
+  <tr><td><code>@Profile("!anz")</code></td><td>Active when "anz" is NOT active</td></tr>
+  <tr><td><code>@Profile({"anz", "wbc"})</code></td><td>Active when "anz" OR "wbc" is active</td></tr>
+  <tr><td><code>@Profile("anz & emir")</code></td><td>Active when BOTH "anz" AND "emir" are active</td></tr>
+  <tr><td><code>@Profile("anz | wbc")</code></td><td>Active when "anz" OR "wbc" is active</td></tr>
+</table>
+
+<div class="callout key-insight">
+  <div class="callout-title">How Exgester uses this</div>
+  <p>Exgester runs as one deployed application but serves multiple banks. At startup, profiles like <code>anz,emir,asic</code> are activated. This causes Spring to wire only ANZ-specific beans and EMIR/ASIC regulatory config. The same JAR, different wiring — that's the multi-tenant magic.</p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "name": "Exgester Mastery",
+  "short_name": "Exgester",
+  "description": "Learning path for mastering the Exgester trade reporting engine",
+  "start_url": "/ExgesterLearningPath/",
+  "display": "standalone",
+  "background_color": "#fdfbf7",
+  "theme_color": "#1e1e2e"
+}

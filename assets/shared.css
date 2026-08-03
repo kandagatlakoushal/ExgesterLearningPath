@@ -1,0 +1,408 @@
+/* ======================================================
+   Exgester Learning Path — Shared Lesson Stylesheet
+   Tufte-inspired. Clean, readable, designed for revisiting.
+   ====================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Source+Code+Pro:wght@400;500;600&family=Inter:wght@400;500;600&display=swap');
+
+/* === Reset & Base === */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Palette */
+  --bg:          #fdfbf7;
+  --bg-code:     #f4f1eb;
+  --bg-aside:    #f0ece4;
+  --bg-quiz:     #eef6f0;
+  --fg:          #1a1a1a;
+  --fg-muted:    #5a5a5a;
+  --fg-light:    #8a8a8a;
+  --accent:      #c0392b;
+  --accent-soft: #e74c3c22;
+  --link:        #2563eb;
+  --link-hover:  #1d4ed8;
+  --success:     #16a34a;
+  --success-bg:  #dcfce7;
+  --warning:     #d97706;
+  --warning-bg:  #fef3c7;
+  --error:       #dc2626;
+  --error-bg:    #fee2e2;
+  --border:      #d4d0c8;
+  --border-light:#e8e4dc;
+
+  /* Track colors for ROP diagrams */
+  --track-right: #16a34a;
+  --track-left:  #dc2626;
+
+  /* Typography */
+  --font-body:   'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-code:   'Source Code Pro', 'Fira Code', 'Consolas', monospace;
+  --font-ui:     'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --line-height: 1.65;
+  --measure:     38em; /* Tufte-style measure */
+}
+
+html { font-size: 18px; }
+
+body {
+  font-family: var(--font-body);
+  color: var(--fg);
+  background: var(--bg);
+  line-height: var(--line-height);
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* === Typography === */
+h1, h2, h3, h4 {
+  font-family: var(--font-ui);
+  line-height: 1.25;
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  border-bottom: 3px solid var(--accent);
+  padding-bottom: 0.4rem;
+  margin-top: 0;
+}
+
+h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-top: 2.5rem;
+}
+
+h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+p { margin-bottom: 1rem; }
+
+a {
+  color: var(--link);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  transition: color 0.15s;
+}
+a:hover { color: var(--link-hover); }
+
+strong { font-weight: 600; }
+
+blockquote {
+  border-left: 4px solid var(--accent);
+  margin: 1.5rem 0;
+  padding: 0.75rem 1.25rem;
+  background: var(--bg-aside);
+  border-radius: 0 6px 6px 0;
+  font-style: italic;
+  color: var(--fg-muted);
+}
+
+/* === Code === */
+code {
+  font-family: var(--font-code);
+  font-size: 0.88em;
+  background: var(--bg-code);
+  padding: 0.15em 0.35em;
+  border-radius: 4px;
+  color: var(--accent);
+}
+
+pre {
+  background: #1e1e2e;
+  color: #cdd6f4;
+  padding: 1.25rem 1.5rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 1.25rem 0;
+  line-height: 1.5;
+  font-size: 0.85rem;
+  border: 1px solid #313244;
+}
+
+pre code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+}
+
+/* Syntax highlighting (Catppuccin-ish) */
+.kw   { color: #cba6f7; }  /* keyword */
+.type { color: #f9e2af; }  /* type */
+.str  { color: #a6e3a1; }  /* string */
+.num  { color: #fab387; }  /* number */
+.cmt  { color: #6c7086; font-style: italic; }  /* comment */
+.fn   { color: #89b4fa; }  /* function */
+.ann  { color: #f38ba8; }  /* annotation */
+
+/* === Lists === */
+ul, ol {
+  margin: 0.75rem 0 1rem 1.5rem;
+}
+li { margin-bottom: 0.35rem; }
+
+/* === Tables === */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.25rem 0;
+  font-size: 0.92rem;
+}
+
+th {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  text-align: left;
+  padding: 0.6rem 0.75rem;
+  background: var(--bg-aside);
+  border-bottom: 2px solid var(--border);
+}
+
+td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+tr:hover td { background: var(--bg-code); }
+
+/* === Lesson Meta === */
+.lesson-meta {
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  color: var(--fg-light);
+  margin-bottom: 2rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.lesson-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* === Callout Boxes === */
+.callout {
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  border-left: 5px solid;
+  font-size: 0.95rem;
+}
+
+.callout-title {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.4rem;
+}
+
+.callout.key-insight   { background: var(--accent-soft); border-color: var(--accent); }
+.callout.tip           { background: var(--success-bg);  border-color: var(--success); }
+.callout.warning       { background: var(--warning-bg);  border-color: var(--warning); }
+.callout.danger        { background: var(--error-bg);    border-color: var(--error);   }
+
+/* === Quiz Widget === */
+.quiz {
+  background: var(--bg-quiz);
+  border: 2px solid #b8d8be;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+}
+
+.quiz-question {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.quiz-options {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.quiz-options li {
+  margin-bottom: 0.5rem;
+}
+
+.quiz-options button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 0.65rem 1rem;
+  background: white;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.quiz-options button:hover {
+  border-color: var(--link);
+  background: #f0f4ff;
+}
+
+.quiz-options button.correct {
+  border-color: var(--success);
+  background: var(--success-bg);
+  font-weight: 500;
+}
+
+.quiz-options button.incorrect {
+  border-color: var(--error);
+  background: var(--error-bg);
+  opacity: 0.7;
+}
+
+.quiz-options button:disabled {
+  cursor: default;
+}
+
+.quiz-feedback {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-size: 0.92rem;
+  display: none;
+}
+
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct { background: var(--success-bg); color: #15803d; }
+.quiz-feedback.incorrect { background: var(--error-bg); color: #b91c1c; }
+
+/* === Exercises === */
+.exercise {
+  background: #f0f4ff;
+  border: 2px solid #93c5fd;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+}
+
+.exercise-title {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--link);
+  margin-bottom: 0.75rem;
+}
+
+/* === Track Diagrams (for ROP) === */
+.track-diagram {
+  font-family: var(--font-code);
+  font-size: 0.82rem;
+  line-height: 1.8;
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem;
+  background: var(--bg-code);
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.track-right { color: var(--track-right); font-weight: 600; }
+.track-left  { color: var(--track-left);  font-weight: 600; }
+.track-arrow { color: var(--fg-muted); }
+
+/* === Navigation === */
+.lesson-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-light);
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+}
+
+.lesson-nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.5rem 1rem;
+  background: var(--bg-code);
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.lesson-nav a:hover { background: var(--bg-aside); }
+
+/* === Footer === */
+.ask-teacher {
+  margin-top: 2.5rem;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, #ede9fe, #e0e7ff);
+  border-radius: 8px;
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+  text-align: center;
+  color: var(--fg-muted);
+}
+
+.ask-teacher strong { color: var(--fg); }
+
+/* === Print Styles === */
+@media print {
+  body { max-width: none; padding: 1cm; }
+  pre { white-space: pre-wrap; border: 1px solid #ccc; }
+  .quiz-options button { border: 1px solid #999; }
+  .lesson-nav, .ask-teacher { display: none; }
+  a { color: var(--fg); text-decoration: none; }
+  a::after { content: " (" attr(href) ")"; font-size: 0.8em; color: var(--fg-muted); }
+}
+
+/* === Responsive (Phone-first for GitHub Pages) === */
+@media (max-width: 600px) {
+  html { font-size: 16px; }
+  body {
+    padding: 1rem;
+    padding-top: env(safe-area-inset-top, 1rem);
+    padding-bottom: env(safe-area-inset-bottom, 2rem);
+  }
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.2rem; }
+  .lesson-meta { flex-direction: column; gap: 0.5rem; }
+  .lesson-nav { flex-direction: column; gap: 0.75rem; }
+  .lesson-nav a { padding: 0.75rem 1rem; } /* bigger touch target */
+
+  pre {
+    font-size: 0.78rem;
+    padding: 1rem;
+    -webkit-overflow-scrolling: touch;
+  }
+  code { font-size: 0.85em; }
+
+  table { font-size: 0.82rem; display: block; overflow-x: auto; }
+
+  .quiz-options button {
+    padding: 0.8rem 1rem; /* bigger touch target on mobile */
+    font-size: 0.92rem;
+  }
+
+  .callout, .exercise, .quiz { padding: 1rem; }
+  .track-diagram { font-size: 0.72rem; }
+}

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Design Patterns in Exgester — Quick Reference</title>
+  <link rel="stylesheet" href="../assets/shared.css">
+</head>
+<body>
+
+<h1>Design Patterns in Exgester — Quick Reference</h1>
+
+<div class="lesson-meta">
+  <span>📖 Reference Document</span>
+  <span>🔗 <a href="https://refactoring.guru/design-patterns">Refactoring.Guru</a></span>
+</div>
+
+<h2>Strategy — Swappable Algorithms</h2>
+<pre><code><span class="cmt">// Interface defines the contract</span>
+<span class="kw">public interface</span> <span class="type">ReportabilityStrategy</span> {
+    <span class="type">Either</span>&lt;<span class="type">Rejection</span>, <span class="type">Boolean</span>&gt; isReportable(<span class="type">TradeEvent</span> event);
+}
+
+<span class="cmt">// Each regulatory region has its own implementation</span>
+<span class="ann">@Service</span> <span class="ann">@Profile("emir")</span>
+<span class="kw">public class</span> <span class="type">EmirReportability</span> <span class="kw">implements</span> <span class="type">ReportabilityStrategy</span> { ... }
+
+<span class="ann">@Service</span> <span class="ann">@Profile("cftc")</span>
+<span class="kw">public class</span> <span class="type">CftcReportability</span> <span class="kw">implements</span> <span class="type">ReportabilityStrategy</span> { ... }
+
+<span class="cmt">// Consumer doesn't know which strategy it got</span>
+<span class="ann">@Service</span>
+<span class="kw">public class</span> <span class="type">DecisionEngine</span> {
+    <span class="kw">private final</span> <span class="type">ReportabilityStrategy</span> strategy; <span class="cmt">// injected by Spring</span>
+}</code></pre>
+<p><strong>When you see it in Exgester:</strong> Different reporting rules per regulatory region, injected via Spring profiles.</p>
+
+<h2>Factory — Object Creation Without Exposure</h2>
+<pre><code><span class="kw">public class</span> <span class="type">SubmissionMessageFactory</span> {
+    <span class="kw">public static</span> <span class="type">SubmissionMessage</span> create(<span class="type">RegulatoryRegion</span> region, <span class="type">TradeContext</span> ctx) {
+        <span class="kw">return switch</span> (region) {
+            <span class="kw">case</span> EMIR  -&gt; <span class="kw">new</span> <span class="type">EmirSubmission</span>(ctx);
+            <span class="kw">case</span> CFTC  -&gt; <span class="kw">new</span> <span class="type">CftcSubmission</span>(ctx);
+            <span class="kw">case</span> ASIC  -&gt; <span class="kw">new</span> <span class="type">AsicSubmission</span>(ctx);
+            <span class="kw">case</span> FCA   -&gt; <span class="kw">new</span> <span class="type">FcaSubmission</span>(ctx);
+        };
+    }
+}</code></pre>
+<p><strong>When you see it in Exgester:</strong> Constructing the right submission message type based on which regulatory region a trade is reported to.</p>
+
+<h2>Template Method — Skeleton with Overridable Steps</h2>
+<pre><code><span class="kw">public abstract class</span> <span class="type">AbstractReportingFlow</span> {
+
+    <span class="cmt">// The template — fixed algorithm skeleton</span>
+    <span class="kw">public final</span> <span class="type">Either</span>&lt;<span class="type">Rejection</span>, <span class="type">SubmissionMessage</span>&gt; process(<span class="type">TradeEvent</span> event) {
+        <span class="kw">return</span> validate(event)
+            .flatMap(<span class="kw">this</span>::enrich)       <span class="cmt">// hook — subclasses override</span>
+            .flatMap(<span class="kw">this</span>::applyRules)    <span class="cmt">// hook — subclasses override</span>
+            .flatMap(<span class="kw">this</span>::format);       <span class="cmt">// hook — subclasses override</span>
+    }
+
+    <span class="cmt">// Common step — not overridable</span>
+    <span class="kw">private</span> <span class="type">Either</span>&lt;<span class="type">Rejection</span>, <span class="type">TradeEvent</span>&gt; validate(<span class="type">TradeEvent</span> e) { ... }
+
+    <span class="cmt">// Hooks — subclasses provide client-specific logic</span>
+    <span class="kw">protected abstract</span> <span class="type">Either</span>&lt;<span class="type">Rejection</span>, <span class="type">TradeContext</span>&gt; enrich(<span class="type">TradeEvent</span> e);
+    <span class="kw">protected abstract</span> <span class="type">Either</span>&lt;<span class="type">Rejection</span>, <span class="type">TradeContext</span>&gt; applyRules(<span class="type">TradeContext</span> ctx);
+    <span class="kw">protected abstract</span> <span class="type">Either</span>&lt;<span class="type">Rejection</span>, <span class="type">SubmissionMessage</span>&gt; format(<span class="type">TradeContext</span> ctx);
+}
+
+<span class="ann">@Service</span> <span class="ann">@Profile("anz")</span>
+<span class="kw">public class</span> <span class="type">AnzReportingFlow</span> <span class="kw">extends</span> <span class="type">AbstractReportingFlow</span> {
+    <span class="ann">@Override</span> <span class="kw">protected</span> <span class="type">Either</span>&lt;...&gt; enrich(...) { <span class="cmt">/* ANZ logic */</span> }
+    <span class="ann">@Override</span> <span class="kw">protected</span> <span class="type">Either</span>&lt;...&gt; applyRules(...) { <span class="cmt">/* ANZ rules */</span> }
+    <span class="ann">@Override</span> <span class="kw">protected</span> <span class="type">Either</span>&lt;...&gt; format(...) { <span class="cmt">/* ANZ format */</span> }
+}</code></pre>
+<p><strong>When you see it in Exgester:</strong> A common reporting flow where the high-level steps are fixed but each client provides different implementations.</p>
+
+<h2>Chain of Responsibility — Sequential Decision Handlers</h2>
+<pre><code><span class="kw">public interface</span> <span class="type">DecisionHandler</span> {
+    <span class="type">Either</span>&lt;<span class="type">Rejection</span>, <span class="type">TradeContext</span>&gt; handle(<span class="type">TradeContext</span> ctx);
+}
+
+<span class="cmt">// Each handler in the chain</span>
+<span class="kw">public class</span> <span class="type">DuplicateCheckHandler</span> <span class="kw">implements</span> <span class="type">DecisionHandler</span> { ... }
+<span class="kw">public class</span> <span class="type">RegionDeterminationHandler</span> <span class="kw">implements</span> <span class="type">DecisionHandler</span> { ... }
+<span class="kw">public class</span> <span class="type">ThresholdCheckHandler</span> <span class="kw">implements</span> <span class="type">DecisionHandler</span> { ... }
+
+<span class="cmt">// Composed via flatMap — this IS the chain</span>
+<span class="type">List</span>&lt;<span class="type">DecisionHandler</span>&gt; handlers = List.of(dupCheck, regionCheck, thresholdCheck);
+
+<span class="type">Either</span>&lt;<span class="type">Rejection</span>, <span class="type">TradeContext</span>&gt; result = handlers
+    .stream()
+    .reduce(
+        <span class="type">Either</span>.right(initialCtx),
+        (either, handler) -&gt; either.flatMap(handler::handle),
+        (a, b) -&gt; a  <span class="cmt">// combiner (unused in sequential stream)</span>
+    );</code></pre>
+<p><strong>When you see it in Exgester:</strong> Decision pipeline steps — each step in the chain can accept, reject, or enrich the trade context.</p>
+
+<h2>Composite — Trees of Rules</h2>
+<pre><code><span class="kw">public interface</span> <span class="type">ReportabilityRule</span> {
+    <span class="kw">boolean</span> matches(<span class="type">TradeEvent</span> event);
+}
+
+<span class="cmt">// Leaf rules</span>
+<span class="kw">public class</span> <span class="type">AssetClassRule</span> <span class="kw">implements</span> <span class="type">ReportabilityRule</span> { ... }
+<span class="kw">public class</span> <span class="type">NotionalThresholdRule</span> <span class="kw">implements</span> <span class="type">ReportabilityRule</span> { ... }
+
+<span class="cmt">// Composite rule — treats children uniformly</span>
+<span class="kw">public class</span> <span class="type">AllOfRule</span> <span class="kw">implements</span> <span class="type">ReportabilityRule</span> {
+    <span class="kw">private final</span> <span class="type">List</span>&lt;<span class="type">ReportabilityRule</span>&gt; children;
+
+    <span class="kw">public boolean</span> matches(<span class="type">TradeEvent</span> event) {
+        <span class="kw">return</span> children.stream().allMatch(r -&gt; r.matches(event));
+    }
+}
+
+<span class="kw">public class</span> <span class="type">AnyOfRule</span> <span class="kw">implements</span> <span class="type">ReportabilityRule</span> {
+    <span class="kw">private final</span> <span class="type">List</span>&lt;<span class="type">ReportabilityRule</span>&gt; children;
+
+    <span class="kw">public boolean</span> matches(<span class="type">TradeEvent</span> event) {
+        <span class="kw">return</span> children.stream().anyMatch(r -&gt; r.matches(event));
+    }
+}</code></pre>
+<p><strong>When you see it in Exgester:</strong> Complex reportability rules composed from simpler sub-rules using AND/OR logic.</p>
+
+<h2>Builder — Complex Object Construction</h2>
+<pre><code><span class="ann">@Value</span>
+<span class="ann">@Builder</span>
+<span class="kw">public class</span> <span class="type">EmirSubmission</span> {
+    <span class="type">String</span> tradeId;
+    <span class="type">String</span> counterpartyLei;
+    <span class="type">String</span> assetClass;
+    <span class="type">BigDecimal</span> notionalAmount;
+    <span class="type">String</span> currency;
+    <span class="type">LocalDate</span> executionDate;
+    <span class="type">LocalDate</span> maturityDate;
+    <span class="type">String</span> uti;           <span class="cmt">// Unique Transaction Identifier</span>
+    <span class="type">String</span> reportingSide;
+}
+
+<span class="cmt">// Usage</span>
+<span class="type">EmirSubmission</span> submission = <span class="type">EmirSubmission</span>.builder()
+    .tradeId(<span class="str">"T-12345"</span>)
+    .counterpartyLei(<span class="str">"5493001KJTIIGC8Y1R12"</span>)
+    .assetClass(<span class="str">"IR"</span>)
+    .notionalAmount(<span class="kw">new</span> <span class="type">BigDecimal</span>(<span class="str">"1000000"</span>))
+    .currency(<span class="str">"USD"</span>)
+    .executionDate(<span class="type">LocalDate</span>.of(<span class="num">2024</span>, <span class="num">1</span>, <span class="num">15</span>))
+    .build();</code></pre>
+<p><strong>When you see it in Exgester:</strong> Building submission messages with many fields, often via Lombok <code>@Builder</code>.</p>
+
+<h2>Pattern Cheat Sheet</h2>
+<table>
+  <tr><th>Pattern</th><th>Purpose</th><th>Exgester Use</th></tr>
+  <tr><td>Strategy</td><td>Swap algorithms at runtime</td><td>Region-specific reportability rules</td></tr>
+  <tr><td>Factory</td><td>Create objects without exposing logic</td><td>Building submission message types</td></tr>
+  <tr><td>Template Method</td><td>Fixed skeleton, variable steps</td><td>Common flow + client overrides</td></tr>
+  <tr><td>Chain of Responsibility</td><td>Sequential handler chain</td><td>Decision pipeline steps</td></tr>
+  <tr><td>Composite</td><td>Tree structure, uniform interface</td><td>Composite reportability rules</td></tr>
+  <tr><td>Builder</td><td>Step-by-step complex construction</td><td>Submission messages via @Builder</td></tr>
+</table>
+
+</body>
+</html>

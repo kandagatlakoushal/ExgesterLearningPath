@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A structured 5-week learning path for mastering the Exgester trade reporting engine codebase — Vavr, Spring Boot, Design Patterns, and more.">
+  <meta name="theme-color" content="#1e1e2e">
+  <link rel="manifest" href="assets/manifest.json">
+  <title>Exgester Mastery — Learning Path</title>
+  <link rel="stylesheet" href="assets/shared.css">
+  <style>
+    body { max-width: 42em; }
+
+    .hero {
+      text-align: center;
+      padding: 2rem 0 1.5rem;
+      border-bottom: 3px solid var(--accent);
+      margin-bottom: 2rem;
+    }
+    .hero h1 {
+      font-size: 2.2rem;
+      border: none;
+      padding: 0;
+      margin-bottom: 0.3rem;
+    }
+    .hero .subtitle {
+      font-family: var(--font-ui);
+      font-size: 0.95rem;
+      color: var(--fg-muted);
+    }
+
+    .nav-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .nav-card {
+      display: flex;
+      flex-direction: column;
+      padding: 1.25rem;
+      background: var(--bg-code);
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      text-decoration: none;
+      color: var(--fg);
+      transition: all 0.2s;
+    }
+    .nav-card:hover {
+      border-color: var(--link);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      transform: translateY(-2px);
+    }
+    .nav-card .icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+    .nav-card .card-title {
+      font-family: var(--font-ui);
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 0.25rem;
+    }
+    .nav-card .card-desc {
+      font-size: 0.8rem;
+      color: var(--fg-muted);
+      line-height: 1.4;
+    }
+
+    .section-header {
+      font-family: var(--font-ui);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-top: 2.5rem;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.3rem;
+      border-bottom: 2px solid var(--accent);
+    }
+
+    .lesson-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .lesson-list li {
+      margin: 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .lesson-list a {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 0.5rem;
+      text-decoration: none;
+      color: var(--fg);
+      transition: background 0.15s;
+    }
+    .lesson-list a:hover {
+      background: var(--bg-code);
+    }
+    .lesson-num {
+      font-family: var(--font-code);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--fg-light);
+      min-width: 2.5rem;
+    }
+    .lesson-title-text {
+      font-family: var(--font-ui);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .empty-state {
+      padding: 1.5rem;
+      text-align: center;
+      color: var(--fg-light);
+      font-family: var(--font-ui);
+      font-size: 0.88rem;
+      background: var(--bg-code);
+      border-radius: 8px;
+    }
+
+    .quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 1rem 0;
+    }
+    .quick-actions a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.4rem 0.8rem;
+      font-family: var(--font-ui);
+      font-size: 0.8rem;
+      font-weight: 500;
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      text-decoration: none;
+      color: var(--fg-muted);
+      transition: all 0.15s;
+    }
+    .quick-actions a:hover {
+      border-color: var(--link);
+      color: var(--link);
+    }
+
+    @media (max-width: 600px) {
+      .nav-grid { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>🚂 Exgester Mastery</h1>
+  <p class="subtitle">A 5-week learning path for mastering S&P Global's trade reporting engine</p>
+</div>
+
+<!-- ===== Quick Navigation Cards ===== -->
+<div class="nav-grid">
+  <a href="reference/curriculum.html" class="nav-card">
+    <span class="icon">📋</span>
+    <span class="card-title">5-Week Curriculum</span>
+    <span class="card-desc">Day-by-day plan with exercises, projects, and build milestones</span>
+  </a>
+  <a href="reference/exercises.html" class="nav-card">
+    <span class="icon">🔨</span>
+    <span class="card-title">Hands-On Exercises</span>
+    <span class="card-desc">All coding exercises and project specs with acceptance criteria</span>
+  </a>
+  <a href="reference/prompt-library.html" class="nav-card">
+    <span class="icon">🎯</span>
+    <span class="card-title">Prompt Library</span>
+    <span class="card-desc">Copy-paste prompts for focused learning sessions</span>
+  </a>
+  <a href="reference/glossary.html" class="nav-card">
+    <span class="icon">📖</span>
+    <span class="card-title">Glossary</span>
+    <span class="card-desc">Domain & technical vocabulary</span>
+  </a>
+</div>
+
+<!-- ===== Cheat Sheets ===== -->
+<div class="section-header">📚 Quick Reference Cheat Sheets</div>
+<div class="quick-actions">
+  <a href="reference/vavr-either-cheatsheet.html">🚂 Vavr Either</a>
+  <a href="reference/spring-profiles-cheatsheet.html">🌱 Spring Profiles</a>
+  <a href="reference/design-patterns-cheatsheet.html">🏗️ Design Patterns</a>
+</div>
+
+<!-- ===== Lessons ===== -->
+<div class="section-header">📝 Lessons</div>
+<div class="empty-state" id="lessons-empty">
+  Lessons will appear here as you progress. Start with <code>/teach</code>
+</div>
+<ul class="lesson-list" id="lessons-list" style="display:none;">
+  <!-- Lessons will be added here as HTML files are created in /lessons/ -->
+</ul>
+
+<!-- ===== Progress ===== -->
+<div class="section-header">🗂️ Course Files</div>
+<div class="quick-actions">
+  <a href="MISSION.md">📌 Mission</a>
+  <a href="RESOURCES.md">📚 Resources</a>
+  <a href="NOTES.md">📝 Notes</a>
+</div>
+
+<hr style="margin-top: 2.5rem;">
+<p style="text-align:center; font-family: var(--font-ui); font-size: 0.8rem; color: var(--fg-light); margin-top: 1rem;">
+  Exgester Learning Path &middot; S&P Global Market Intelligence &middot; Cappitech
+</p>
+
+</body>
+</html>
