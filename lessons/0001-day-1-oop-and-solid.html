@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day 1: OOP & SOLID in 60 Minutes</title>
+  <link rel="stylesheet" href="../assets/shared.css">
+</head>
+<body>
+
+<h1>Day 1: OOP & SOLID in 60 Minutes</h1>
+
+<div class="lesson-meta">
+  <span>🎯 Week 1: Java Foundations</span>
+  <span>⏱️ 60 minutes</span>
+</div>
+
+<p>Before diving into the functional world of Vavr and Railway-Oriented Programming, we need to ensure our Java fundamentals are rock solid. Exgester's architecture is heavily based on SOLID principles, specifically the <strong>Single Responsibility Principle (SRP)</strong> and the <strong>Open-Closed Principle (OCP)</strong>.</p>
+
+<div class="callout key-insight">
+  <div class="callout-title">How Exgester uses SOLID</div>
+  <p>In Exgester, a <code>DecisionStep</code> does exactly one thing (SRP): validate formatting, OR check thresholds, OR determine the region. When a new regulatory rule is added, we don't modify existing code; we add a new step or strategy (OCP). This makes the massive codebase maintainable.</p>
+</div>
+
+<h2>The Core Principles</h2>
+<ul>
+  <li><strong>S</strong>ingle Responsibility: A class should have one, and only one, reason to change.</li>
+  <li><strong>O</strong>pen-Closed: Software entities should be open for extension, but closed for modification.</li>
+  <li><strong>L</strong>iskov Substitution: Subtypes must be substitutable for their base types.</li>
+  <li><strong>I</strong>nterface Segregation: Many client-specific interfaces are better than one general-purpose interface.</li>
+  <li><strong>D</strong>ependency Inversion: Depend upon abstractions, not concretions.</li>
+</ul>
+
+<div class="exercise">
+  <div class="exercise-title">Your Task</div>
+  <p>Your first build task is to take a monolithic, messy <code>TradeProcessor</code> class and refactor it into clean, SOLID components.</p>
+  <p><a href="../reference/exercises.html#e1" style="font-weight: bold; text-decoration: underline;">→ Go to Exercise E1: SOLID Trade Refactor</a></p>
+</div>
+
+<hr>
+<nav class="lesson-nav" style="display: flex; gap: 1rem;">
+  <a href="../index.html">← Back to Home</a>
+  <a href="0002-day-2-generics.html">Next Lesson: Day 2 →</a>
+</nav>
+
+<div class="ask-teacher">
+  <strong>Stuck?</strong> Come back to the chat and ask me for hints! Tell me what you're struggling with in Exercise E1.
+</div>
+
+</body>
+</html>

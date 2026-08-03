@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day 2: Generics — Reading Exgester's Type Signatures</title>
+  <link rel="stylesheet" href="../assets/shared.css">
+</head>
+<body>
+
+<h1>Day 2: Generics — Reading Exgester's Type Signatures</h1>
+
+<div class="lesson-meta">
+  <span>🎯 Week 1: Java Foundations</span>
+  <span>⏱️ 60 minutes</span>
+</div>
+
+<p>Exgester relies heavily on Java Generics to build its reusable decision pipeline. You will frequently encounter signatures like <code>Either&lt;Rejection, TradeContext&gt;</code> or <code>DecisionStep&lt;I, O&gt;</code>.</p>
+
+<h2>Key Concepts</h2>
+<ul>
+  <li><strong>Type Parameters:</strong> e.g., <code>&lt;T&gt;</code> allows classes and methods to operate on objects of various types while providing compile-time type safety.</li>
+  <li><strong>Bounded Wildcards:</strong> 
+    <ul>
+      <li><code>? extends T</code> (Upper Bound): Represents an unknown type that is a subtype of T or T itself. Used for reading/producing values (PECS: Producer Extends, Consumer Super).</li>
+      <li><code>? super T</code> (Lower Bound): Represents an unknown type that is a supertype of T or T itself. Used for writing/consuming values.</li>
+    </ul>
+  </li>
+  <li><strong>Type Erasure:</strong> Java removes generic type information at compile time. <code>List&lt;String&gt;</code> and <code>List&lt;Integer&gt;</code> both become just <code>List</code> at runtime.</li>
+</ul>
+
+<div class="callout tip">
+  <div class="callout-title">The PECS Rule</div>
+  <p><strong>P</strong>roducer <strong>E</strong>xtends, <strong>C</strong>onsumer <strong>S</strong>uper.<br>If your method needs a collection to <em>read</em> from, use <code>? extends T</code>. If it needs a collection to <em>add</em> to, use <code>? super T</code>.</p>
+</div>
+
+<div class="exercise">
+  <div class="exercise-title">Your Task</div>
+  <p>You will build a generic <code>DecisionStep&lt;I, O&gt;</code> interface and wire up a multi-step pipeline using generic types.</p>
+  <p><a href="../reference/exercises.html#e2" style="font-weight: bold; text-decoration: underline;">→ Go to Exercise E2: Generic DecisionStep</a></p>
+</div>
+
+<hr>
+<nav class="lesson-nav" style="display: flex; gap: 1rem;">
+  <a href="0001-day-1-oop-and-solid.html">← Previous: Day 1</a>
+  <a href="../index.html">Home</a>
+  <a href="0003-day-3-lambdas.html">Next Lesson: Day 3 →</a>
+</nav>
+
+<div class="ask-teacher">
+  <strong>Stuck?</strong> If bounded wildcards are confusing you, ask me for more examples in the chat!
+</div>
+
+</body>
+</html>

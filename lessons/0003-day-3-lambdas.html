@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day 3: Functional Interfaces & Lambdas</title>
+  <link rel="stylesheet" href="../assets/shared.css">
+</head>
+<body>
+
+<h1>Day 3: Functional Interfaces & Lambdas</h1>
+
+<div class="lesson-meta">
+  <span>🎯 Week 1: Java Foundations</span>
+  <span>⏱️ 45 minutes</span>
+</div>
+
+<p>To master Vavr and Exgester's pipeline, you must be comfortable treating functions as data. Java 8 introduced Functional Interfaces (interfaces with a single abstract method) and Lambdas to make this clean and concise.</p>
+
+<h2>The Core Functional Interfaces</h2>
+<table>
+  <tr><th>Interface</th><th>Signature</th><th>Use Case in Exgester</th></tr>
+  <tr><td><code>Function&lt;T, R&gt;</code></td><td><code>R apply(T t)</code></td><td>Transforming a TradeEvent into a TradeContext</td></tr>
+  <tr><td><code>Predicate&lt;T&gt;</code></td><td><code>boolean test(T t)</code></td><td>Filtering trades (e.g., is notional &gt; 5000?)</td></tr>
+  <tr><td><code>Consumer&lt;T&gt;</code></td><td><code>void accept(T t)</code></td><td>Side-effects, like logging a rejection</td></tr>
+  <tr><td><code>Supplier&lt;T&gt;</code></td><td><code>T get()</code></td><td>Lazy evaluation, creating default values</td></tr>
+</table>
+
+<h2>Method References</h2>
+<p>Often, a lambda just calls an existing method. You can use <code>::</code> syntax for brevity:</p>
+<pre><code><span class="cmt">// Lambda</span>
+trades.forEach(t -&gt; System.out.println(t));
+
+<span class="cmt">// Method Reference</span>
+trades.forEach(System.out::println);</code></pre>
+
+<div class="exercise">
+  <div class="exercise-title">Your Task</div>
+  <p>You will build a dynamic trade filter that composes multiple <code>Predicate&lt;TradeEvent&gt;</code> lambdas together using <code>.and()</code>.</p>
+  <p><a href="../reference/exercises.html#e3" style="font-weight: bold; text-decoration: underline;">→ Go to Exercise E3: Lambda Trade Filter</a></p>
+</div>
+
+<hr>
+<nav class="lesson-nav" style="display: flex; gap: 1rem;">
+  <a href="0002-day-2-generics.html">← Previous: Day 2</a>
+  <a href="../index.html">Home</a>
+</nav>
+
+<div class="ask-teacher">
+  <strong>Stuck?</strong> Ask me for help if you have trouble chaining the predicates together!
+</div>
+
+</body>
+</html>
