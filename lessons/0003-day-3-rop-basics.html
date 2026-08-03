@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day 3: Railway-Oriented Programming (ROP) Basics</title>
+  <link rel="stylesheet" href="../assets/shared.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+
+<div class="lesson-meta">
+  <span><span class="tag tag-knowledge">Knowledge</span> Day 3</span>
+  <span>⏱️ 25 min read</span>
+</div>
+
+<h1>Day 3: Railway-Oriented Programming (ROP)</h1>
+
+<p>Welcome to the most important architectural pattern in the Exgester module: <strong>Railway-Oriented Programming (ROP)</strong>. This concept dictates how all trade events flow through our decision engines.</p>
+
+<p>When processing a trade, we must execute a series of validations: Is the trade valid JSON? Does it have a known counterparty? Is the notional amount within limits? In traditional imperative programming, this results in deeply nested <code>if-else</code> blocks or excessive exception throwing. ROP solves this elegantly.</p>
+
+<h2>1. The Two-Track Model</h2>
+
+<p>Imagine a railway switch. A train (our Trade Event) enters the switch. If everything is fine, it continues on the <strong>Happy Track</strong> (Green). If something goes wrong, it gets switched to the <strong>Error Track</strong> (Red).</p>
+
+<p>Once a train is on the Error Track, it bypasses all subsequent "Happy Track" switches and goes straight to the end of the line (e.g., an error log or rejection queue).</p>
+
+<h2>2. Enter Vavr <code>Either&lt;L, R&gt;</code></h2>
+
+<p>In Vavr, the <code>Either</code> type represents a value of one of two possible types: a <strong>Left</strong> (by convention, the error/rejection track) or a <strong>Right</strong> (the success/happy track).</p>
+
+<pre><code class="language-java">
+import io.vavr.control.Either;
+
+// A successful validation
+Either&lt;String, Trade&gt; success = Either.right(new Trade("T1", "EMIR"));
+
+// A failed validation
+Either&lt;String, Trade&gt; failure = Either.left("Trade missing LEI code");
+</code></pre>
+
+<h2>3. Why is this powerful?</h2>
+
+<p>Because <code>Either</code> is "Right-biased", you can chain operations on it. If an <code>Either</code> is currently a <code>Right</code>, the operation executes. If it is already a <code>Left</code>, the operation is skipped.</p>
+
+<pre><code class="language-java">
+public Either&lt;String, Trade&gt; validateNotional(Trade trade) {
+    if (trade.notional() &lt;= 0) {
+        return Either.left("Invalid Notional");
+    }
+    return Either.right(trade);
+}
+
+// Processing a Right
+Either&lt;String, Trade&gt; goodTrade = Either.&lt;String, Trade&gt;right(new Trade("T1", 100.0));
+goodTrade.flatMap(this::validateNotional); // Returns Right(Trade)
+
+// Processing a Left (Short-circuiting!)
+Either&lt;String, Trade&gt; badTrade = Either.&lt;String, Trade&gt;right(new Trade("T2", -50.0));
+badTrade.flatMap(this::validateNotional); // Returns Left("Invalid Notional")
+</code></pre>
+
+<div class="callout tip">
+  <div class="callout-title">The FlatMap Magic</div>
+  <p><code>flatMap</code> is the switch on the railway. It takes the current <code>Right</code> value, runs it through a function that returns an <code>Either</code>, and flattens the result. If the function returns a <code>Left</code>, the train has been moved to the Error Track.</p>
+</div>
+
+<hr>
+
+<h2>Your Build Task for Today</h2>
+
+<div class="callout warning">
+  <div class="callout-title">Exercise: First Either Validation</div>
+  <p>Head over to <a href="../reference/exercises.html#day3">Exercises: Day 3</a>. You will write your first pure Java validation functions that return <code>Either&lt;String, Trade&gt;</code>.</p>
+</div>
+
+<nav class="lesson-nav">
+  <a href="0002-day-2-vavr-intro.html">← Previous: Day 2</a>
+  <a href="0004-day-4-composing-functions.html">Next: Day 4 →</a>
+</nav>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+</body>
+</html>

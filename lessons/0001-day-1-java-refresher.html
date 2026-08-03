@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day 1: Java 11+ Refresher & Immutability</title>
+  <link rel="stylesheet" href="../assets/shared.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+
+<div class="lesson-meta">
+  <span><span class="tag tag-knowledge">Knowledge</span> Day 1</span>
+  <span>⏱️ 20 min read</span>
+</div>
+
+<h1>Day 1: Java 11+ Refresher & Immutability</h1>
+
+<p>Welcome to Day 1 of Exgester Mastery. Before we dive into Railway-Oriented Programming and Spring profiles, we must ensure our foundational Java skills are solid. The Exgester codebase relies heavily on modern Java idioms to keep complex data transformations safe.</p>
+
+<p>Today, we will focus on the most important concept in data-heavy pipelines: <strong>Immutability</strong>.</p>
+
+<div class="callout tip">
+  <div class="callout-title">The Exgester Context</div>
+  <p>In Exgester, a trade event passes through dozens of decision steps. If one step modifies the trade object in place (mutability), it becomes impossible to reason about what the trade looked like at the start of the pipeline vs the end. Bugs become untraceable.</p>
+</div>
+
+<h2>1. The Power of Immutability</h2>
+
+<p>An immutable object cannot be changed after it is constructed. To "change" an immutable object, you must create a <strong>new</strong> instance with the updated values.</p>
+
+<h3>The Anti-Pattern: Mutable POJO</h3>
+<pre><code class="language-java">
+// ❌ BAD: Mutable
+public class Trade {
+    private String tradeId;
+    private String status;
+    
+    // Setters allow anyone to modify the state at any time
+    public void setStatus(String status) {
+        this.status = status;
+    }
+}
+</code></pre>
+
+<h3>The Solution: Immutable Value Object</h3>
+<pre><code class="language-java">
+// ✅ GOOD: Immutable with Java 17 Records
+public record Trade(String tradeId, String status) {
+    
+    // To change status, return a new copy
+    public Trade withStatus(String newStatus) {
+        return new Trade(this.tradeId, newStatus);
+    }
+}
+</code></pre>
+
+<h2>2. Optional: Banishing NullPointerExceptions</h2>
+
+<p>Exgester pipelines are allergic to <code>null</code>. When you look up a region config, or parse an optional XML field, you must use <code>Optional</code> to signal to the caller that the value might be missing.</p>
+
+<pre><code class="language-java">
+// ❌ BAD: Returns null
+public String getLei(Trade trade) {
+    if (trade.getCounterparty() != null) {
+        return trade.getCounterparty().getLei();
+    }
+    return null; // A crash waiting to happen downstream
+}
+
+// ✅ GOOD: Returns Optional
+public Optional&lt;String&gt; getLei(Trade trade) {
+    return Optional.ofNullable(trade.getCounterparty())
+                   .map(Counterparty::getLei);
+}
+</code></pre>
+
+<h2>3. Streams & Lambdas</h2>
+
+<p>Declarative data processing is key. Instead of <code>for</code> loops that mutate a list, we use Streams to map and filter data.</p>
+
+<pre><code class="language-java">
+// Find all trades that need EMIR reporting
+List&lt;Trade&gt; emirTrades = trades.stream()
+    .filter(t -&gt; "EMIR".equals(t.getRegion()))
+    .filter(t -&gt; t.getNotional() &gt; 10000)
+    .collect(Collectors.toList());
+</code></pre>
+
+<hr>
+
+<h2>Your Build Task for Today</h2>
+
+<div class="callout warning">
+  <div class="callout-title">Exercise: Trade Domain Model</div>
+  <p>Head over to <a href="../reference/exercises.html#day1">Exercises: Day 1</a>. Your task is to build a pure Java, deeply immutable <code>Trade</code> domain model using final classes, final fields, and defensive copying for Lists.</p>
+</div>
+
+<p><em>When you're done, ask me to review your code!</em></p>
+
+<nav class="lesson-nav">
+  <a href="../reference/curriculum.html">← Curriculum</a>
+</nav>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+</body>
+</html>

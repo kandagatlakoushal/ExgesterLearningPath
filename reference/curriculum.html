@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Exgester Mastery — 5-Week Curriculum</title>
+  <title>Exgester Mastery — 4-Week Curriculum</title>
   <link rel="stylesheet" href="../assets/shared.css">
   <style>
     .week-header {
@@ -80,10 +80,10 @@
 </head>
 <body>
 
-<h1>Exgester Mastery — 5-Week Curriculum</h1>
+<h1>Exgester Mastery — 4-Week Curriculum</h1>
 
 <div class="lesson-meta">
-  <span>📅 ~35 sessions</span>
+  <span>📅 20 sessions (4 weeks)</span>
   <span>⏱️ 1–2 hours per day</span>
   <span>🎯 Goal: Independently modify & maintain Exgester</span>
 </div>
@@ -93,382 +93,200 @@
   <span><span class="tag tag-skill">Skill</span> Hands-on exercise</span>
   <span><span class="tag tag-build">Build</span> Add to your project</span>
   <span><span class="tag tag-project">Project</span> Milestone build</span>
-  <span><span class="tag tag-review">Review</span> Recall + quiz</span>
 </div>
 
-<p>Every day has a <strong>concrete build task</strong>. You learn the concept for ~30 min, then spend the remaining time coding. All exercises and acceptance criteria are in the <a href="exercises.html">Hands-On Exercises</a> doc.</p>
+<p>Every day has a <strong>concrete build task</strong> focused on creating a "MiniExgester" application from scratch.</p>
 
 <div class="callout tip">
   <div class="callout-title">How to use this</div>
   <p>Start each session with <code>/teach</code>. I'll deliver the concept lesson, then you code the exercise yourself. If you get stuck, ask me — I'll guide without spoiling the answer.</p>
 </div>
 
-<div class="callout key-insight">
-  <div class="callout-title">Progressive Build Strategy</div>
-  <p><strong>Weeks 1–2:</strong> Standalone Java files in a <code>week1/</code> / <code>week2/</code> folder. No Spring yet.<br>
-  <strong>Week 3:</strong> You create a Spring Boot Maven project and start building the real app.<br>
-  <strong>Weeks 4–5:</strong> You refactor and extend that same project until it's a working mini-Exgester.</p>
-</div>
-
 <!-- ============ WEEK 1 ============ -->
-<div class="week-header">Week 1 — Java Foundations & Functional Thinking</div>
-<p>Build language fluency. All exercises are standalone Java files in <code>week1/</code>.</p>
+<div class="week-header">Week 1 — Core Java & Functional Foundations</div>
+<p>Build the core Railway-Oriented Programming (ROP) pipeline in pure Java. No Spring yet.</p>
 
 <div class="day">
-  <div class="day-title">Day 1: OOP & SOLID in 60 Minutes</div>
+  <div class="day-title">Day 1: Java 11+ Refresher</div>
   <div class="day-detail">
     <span class="tag tag-knowledge">Knowledge</span> <span class="tag tag-build">Build</span>
-    <br>Learn the five SOLID principles with Exgester-flavored examples. Then refactor a monolithic <code>TradeProcessor</code> class into 4 SOLID classes.
-    <br><strong>Source:</strong> Effective Java, Items 15–22
-    <br><a href="exercises.html#e1" class="exercise-link">→ Exercise E1: SOLID Trade Refactor</a>
+    <br>Immutability, Streams, Lambdas, Optional. Build the core Trade Domain Models.
+    <br><a href="exercises.html#day1" class="exercise-link">→ Exercise: Trade Domain Model</a>
   </div>
 </div>
-
 <div class="day">
-  <div class="day-title">Day 2: Generics — Reading Exgester's Type Signatures</div>
+  <div class="day-title">Day 2: Introduction to Vavr</div>
   <div class="day-detail">
     <span class="tag tag-knowledge">Knowledge</span> <span class="tag tag-build">Build</span>
-    <br>Bounded types, wildcards (<code>? extends</code>, <code>? super</code>), type erasure. Build a generic pipeline interface.
-    <br><strong>Source:</strong> Effective Java, Items 26–33
-    <br><a href="exercises.html#e2" class="exercise-link">→ Exercise E2: Generic DecisionStep Interface</a>
+    <br><code>Option</code>, <code>Try</code>, <code>Tuple</code>. Build a safe JSON parsing wrapper.
+    <br><a href="exercises.html#day2" class="exercise-link">→ Exercise: Safe Trade Parser</a>
   </div>
 </div>
-
 <div class="day">
-  <div class="day-title">Day 3: Functional Interfaces & Lambdas</div>
+  <div class="day-title">Day 3: Railway-Oriented Programming (ROP) Basics</div>
   <div class="day-detail">
     <span class="tag tag-knowledge">Knowledge</span> <span class="tag tag-build">Build</span>
-    <br><code>Function</code>, <code>Predicate</code>, <code>Consumer</code>, <code>Supplier</code>, method references. Build a configurable trade filter using lambdas.
-    <br><strong>Source:</strong> Effective Java, Items 42–44
-    <br><a href="exercises.html#e3" class="exercise-link">→ Exercise E3: Lambda Trade Filter</a>
+    <br><code>Either&lt;L,R&gt;</code>, Happy path vs Error path.
+    <br><a href="exercises.html#day3" class="exercise-link">→ Exercise: First Either Validation</a>
   </div>
 </div>
-
 <div class="day">
-  <div class="day-title">Day 4: Streams — Data Transformation Pipelines</div>
-  <div class="day-detail">
-    <span class="tag tag-build">Build</span>
-    <br><code>map</code>, <code>filter</code>, <code>flatMap</code>, <code>collect</code>, <code>reduce</code>, <code>groupingBy</code>. Build a trade analytics dashboard using only Streams.
-    <br><strong>Source:</strong> Effective Java, Items 45–48
-    <br><a href="exercises.html#e4" class="exercise-link">→ Exercise E4: Stream Analytics Dashboard</a>
-  </div>
-</div>
-
-<div class="day">
-  <div class="day-title">Day 5: Optional & Immutability</div>
+  <div class="day-title">Day 4: Composing Functions</div>
   <div class="day-detail">
     <span class="tag tag-knowledge">Knowledge</span> <span class="tag tag-build">Build</span>
-    <br>Optional API, immutable value objects, final fields. Build the trade domain model you'll use for the entire course.
-    <br><strong>Source:</strong> Effective Java, Items 17, 55
-    <br><a href="exercises.html#e5" class="exercise-link">→ Exercise E5: Immutable Trade Domain Model</a>
+    <br>Higher-order functions, functional interfaces, chaining <code>Either</code> with <code>flatMap</code>.
+    <br><a href="exercises.html#day4" class="exercise-link">→ Exercise: Composable Pipeline Steps</a>
   </div>
 </div>
-
-<div class="day">
-  <div class="day-title">Day 6: Functional Composition & Higher-Order Functions</div>
-  <div class="day-detail">
-    <span class="tag tag-knowledge">Knowledge</span> <span class="tag tag-build">Build</span>
-    <br><code>Function.andThen</code>, <code>Predicate.and/or</code>. Build a composable validation pipeline that collects all errors.
-    <br><a href="exercises.html#e6" class="exercise-link">→ Exercise E6: Composable Validation Pipeline</a>
-  </div>
-</div>
-
 <div class="day milestone-day">
-  <div class="day-title">Day 7: 🏁 Milestone 1 — Week 1 Integration</div>
+  <div class="day-title">Day 5: 🏁 Milestone 1 — Pure Java ROP Pipeline</div>
   <div class="day-detail">
-    <span class="tag tag-project">Project</span> <span class="tag tag-review">Review</span>
-    <br>Wire E1–E6 together into one working program. This is your "imperative baseline" — you'll rebuild it functionally with Vavr next week.
-    <br><a href="exercises.html#m1" class="exercise-link">→ Milestone 1: Integration Build</a>
-    <div class="build-note">⚡ Quiz on Week 1 concepts after completing the build</div>
+    <span class="tag tag-project">Project</span>
+    <br>Build a pure Java ROP pipeline for validating a Trade Event. Ensure side-effect isolation.
+    <br><a href="exercises.html#m1" class="exercise-link">→ Milestone 1: Trade Validation Pipeline</a>
   </div>
 </div>
 
 <!-- ============ WEEK 2 ============ -->
-<div class="week-header">Week 2 — Vavr & Railway-Oriented Programming</div>
-<p>The <em>most critical week</em>. Create a <code>week2/</code> Maven project with Vavr. Reuse your domain model.</p>
+<div class="week-header">Week 2 — Spring Boot & Multi-Tenancy</div>
+<p>Create your Maven project. Wrap Week 1's logic in Spring Boot and add Multi-Tenancy.</p>
 
 <div class="day">
-  <div class="day-title">Day 8: Vavr Option & Try</div>
+  <div class="day-title">Day 6: Spring Boot Fundamentals</div>
   <div class="day-detail">
     <span class="tag tag-knowledge">Knowledge</span> <span class="tag tag-build">Build</span>
-    <br><code>Option.of</code>, <code>Try.of</code>, <code>Try.toEither</code>. Build a trade event parser that wraps risky JSON parsing with Try.
-    <br><strong>Source:</strong> <a href="https://www.vavr.io/vavr-docs/">Vavr User Guide</a>
-    <br><a href="exercises.html#e7" class="exercise-link">→ Exercise E7: Try-Wrapping Risky Code</a>
+    <br>DI, Constructor Injection, Beans, Scopes.
+    <br><a href="exercises.html#day6" class="exercise-link">→ Exercise: Spring-Wired Pipeline</a>
   </div>
 </div>
-
 <div class="day">
-  <div class="day-title">Day 9: Either&lt;L,R&gt; — The Two-Track Type</div>
+  <div class="day-title">Day 7: Configuration & YAML</div>
   <div class="day-detail">
     <span class="tag tag-knowledge">Knowledge</span> <span class="tag tag-build">Build</span>
-    <br>Right-biased semantics, <code>map</code>, <code>flatMap</code>, <code>fold</code>, <code>mapLeft</code>. Practice every core operation via a kata.
-    <br><strong>Source:</strong> <a href="https://fsharpforfunandprofit.com/rop/">Scott Wlaschin — ROP</a>
-    <br><a href="exercises.html#e8" class="exercise-link">→ Exercise E8: Either Fundamentals Kata</a>
+    <br><code>@ConfigurationProperties</code>, managing complex YAML structures for configuration.
+    <br><a href="exercises.html#day7" class="exercise-link">→ Exercise: Type-Safe YAML Config</a>
   </div>
 </div>
-
-<div class="day build-day">
-  <div class="day-title">Day 10: 🏗️ Building Your First Decision Pipeline</div>
-  <div class="day-detail">
-    <span class="tag tag-build">Build</span> <span class="tag tag-project">Project</span>
-    <br><strong>THE MOST IMPORTANT EXERCISE.</strong> Build a 4-step decision pipeline with <code>Either&lt;RejectionReason, TradeContext&gt;</code>. Chain with <code>flatMap</code>. See short-circuiting in action.
-    <br><strong>Source:</strong> <a href="https://www.baeldung.com/vavr-either">Baeldung — Vavr Either</a>
-    <br><a href="exercises.html#e9" class="exercise-link">→ Exercise E9: First Decision Pipeline ⭐</a>
-  </div>
-</div>
-
 <div class="day">
-  <div class="day-title">Day 11: Advanced ROP — peek, mapLeft, filterOrElse</div>
+  <div class="day-title">Day 8: Multi-Tenancy with Spring Profiles</div>
   <div class="day-detail">
     <span class="tag tag-knowledge">Knowledge</span> <span class="tag tag-build">Build</span>
-    <br>Logging without breaking the pipeline, error enrichment, conditional rejection. Enhance E9's pipeline with audit trails.
-    <br><a href="exercises.html#e10" class="exercise-link">→ Exercise E10: Pipeline Enhancements</a>
+    <br>Creating profiles for <code>ANZ</code>, <code>Wbc</code>, <code>Santander</code>.
+    <br><a href="exercises.html#day8" class="exercise-link">→ Exercise: Client-Specific Profiles</a>
   </div>
 </div>
-
 <div class="day">
-  <div class="day-title">Day 12: Vavr Tuples & Pattern Matching</div>
+  <div class="day-title">Day 9: Conditional Beans</div>
   <div class="day-detail">
     <span class="tag tag-knowledge">Knowledge</span> <span class="tag tag-build">Build</span>
-    <br>Carrying multiple values with Tuple. Vavr <code>Match</code> for branching. Route trades to region-specific sub-pipelines.
-    <br><a href="exercises.html#e11" class="exercise-link">→ Exercise E11: Tuple Routing & Pattern Matching</a>
+    <br><code>@ConditionalOnProperty</code>, overriding beans.
+    <br><a href="exercises.html#day9" class="exercise-link">→ Exercise: Dynamic Bean Injection</a>
   </div>
 </div>
-
-<div class="day">
-  <div class="day-title">Day 13: Side-Effect Isolation — Pure Core, Imperative Shell</div>
-  <div class="day-detail">
-    <span class="tag tag-knowledge">Knowledge</span> <span class="tag tag-build">Build</span>
-    <br>Separate your code into a pure decision core (zero I/O) and an imperative shell (all I/O). Make the pipeline unit-testable without mocks.
-    <br><a href="exercises.html#e12" class="exercise-link">→ Exercise E12: Pure Core, Imperative Shell</a>
-  </div>
-</div>
-
 <div class="day milestone-day">
-  <div class="day-title">Day 14: 🏁 Milestone 2 — Pipeline Challenge (Timed)</div>
+  <div class="day-title">Day 10: 🏁 Milestone 2 — Spring Profile Validation</div>
   <div class="day-detail">
-    <span class="tag tag-project">Project</span> <span class="tag tag-review">Review</span>
-    <br>60-minute timed challenge: build a 6-step pipeline from scratch without referencing previous code. Then debug a broken pipeline.
-    <br><a href="exercises.html#m2" class="exercise-link">→ Milestone 2: Pipeline Challenge</a>
-    <div class="build-note">⚡ Ask me <code>/teach debug-challenge</code> for a generated buggy pipeline to fix</div>
+    <span class="tag tag-project">Project</span>
+    <br>Wrap the Week 1 pipeline in a Spring Boot app, injecting client-specific validation rules based on active profiles.
+    <br><a href="exercises.html#m2" class="exercise-link">→ Milestone 2: Multi-Tenant App</a>
   </div>
 </div>
 
 <!-- ============ WEEK 3 ============ -->
-<div class="week-header">Week 3 — Spring Boot, Profiles & Messaging</div>
-<p><strong>You create your Spring Boot project this week.</strong> Add: Spring Boot, ActiveMQ, Vavr, Jackson, Lombok. Copy your domain model from Week 2.</p>
-
-<div class="day build-day">
-  <div class="day-title">Day 15: 🏗️ Spring-Wired Pipeline</div>
-  <div class="day-detail">
-    <span class="tag tag-knowledge">Knowledge</span> <span class="tag tag-build">Build</span>
-    <br>DI, <code>@Component</code>, <code>@Service</code>, <code>@RequiredArgsConstructor</code>. Take your Week 2 pipeline and wire it into Spring Boot.
-    <br><strong>Source:</strong> <a href="https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/">Spring Boot Reference</a>
-    <br><a href="exercises.html#e13" class="exercise-link">→ Exercise E13: Spring-Wired Pipeline</a>
-  </div>
-</div>
-
-<div class="day build-day">
-  <div class="day-title">Day 16: 🏗️ Two Clients, Two Profiles</div>
-  <div class="day-detail">
-    <span class="tag tag-knowledge">Knowledge</span> <span class="tag tag-build">Build</span>
-    <br><code>@Profile</code>, <code>spring.profiles.active</code>, profile-specific YAML, custom annotations. Support alpha-bank and beta-bank with different behavior.
-    <br><strong>Source:</strong> <a href="https://www.baeldung.com/spring-profiles">Baeldung — Spring Profiles</a>
-    <br><a href="exercises.html#e14" class="exercise-link">→ Exercise E14: Two Clients, Two Profiles</a>
-  </div>
-</div>
+<div class="week-header">Week 3 — Design Patterns & Messaging</div>
+<p>Connect your application to ActiveMQ/JMS and refactor to use structural design patterns.</p>
 
 <div class="day">
-  <div class="day-title">Day 17: YAML Configuration Deep Dive</div>
+  <div class="day-title">Day 11: Behavioral Patterns</div>
   <div class="day-detail">
     <span class="tag tag-knowledge">Knowledge</span> <span class="tag tag-build">Build</span>
-    <br><code>@ConfigurationProperties</code>, type-safe config, nested YAML. Make pipeline thresholds configurable via YAML.
-    <br><strong>Source:</strong> <a href="https://www.baeldung.com/spring-yaml">Baeldung — Spring YAML</a>
-    <br><a href="exercises.html#e15" class="exercise-link">→ Exercise E15: Type-Safe YAML Config</a>
+    <br>Strategy, Chain of Responsibility, and Template Method in Trade Validation.
+    <br><a href="exercises.html#day11" class="exercise-link">→ Exercise: Pluggable Strategies</a>
   </div>
 </div>
-
-<div class="day build-day">
-  <div class="day-title">Day 18–19: 🏗️ JMS Message Flow (2 sessions)</div>
-  <div class="day-detail">
-    <span class="tag tag-knowledge">Knowledge</span> <span class="tag tag-build">Build</span>
-    <br>Queue vs Topic, <code>@JmsListener</code>, <code>JmsTemplate</code>, embedded ActiveMQ. Build the full message receive → process → send flow.
-    <br><strong>Source:</strong> <a href="https://www.baeldung.com/spring-jms">Baeldung — Spring JMS</a>
-    <br><a href="exercises.html#e16" class="exercise-link">→ Exercise E16: JMS Message Receiver</a>
-  </div>
-</div>
-
 <div class="day">
-  <div class="day-title">Day 20: Jackson — Polymorphic Trade Events</div>
+  <div class="day-title">Day 12: Structural & Creational Patterns</div>
   <div class="day-detail">
     <span class="tag tag-knowledge">Knowledge</span> <span class="tag tag-build">Build</span>
-    <br><code>ObjectMapper</code>, <code>@JsonTypeInfo</code>, <code>@JsonSubTypes</code>. Deserialize NewTrade/AmendTrade/CancelTrade from a type discriminator field.
-    <br><a href="exercises.html#e17" class="exercise-link">→ Exercise E17: Jackson Polymorphic Deserialization</a>
+    <br>Factory (for regulatory messages), Builder, Composite.
+    <br><a href="exercises.html#day12" class="exercise-link">→ Exercise: Factory & Builder Implementation</a>
   </div>
 </div>
-
+<div class="day">
+  <div class="day-title">Day 13: Messaging Fundamentals</div>
+  <div class="day-detail">
+    <span class="tag tag-knowledge">Knowledge</span> <span class="tag tag-build">Build</span>
+    <br>JMS concepts, ActiveMQ, Queues vs Topics.
+    <br><a href="exercises.html#day13" class="exercise-link">→ Exercise: ActiveMQ Setup & Config</a>
+  </div>
+</div>
+<div class="day">
+  <div class="day-title">Day 14: Spring JMS</div>
+  <div class="day-detail">
+    <span class="tag tag-knowledge">Knowledge</span> <span class="tag tag-build">Build</span>
+    <br><code>@JmsListener</code>, <code>JmsTemplate</code>, JSON serialization/deserialization with Jackson.
+    <br><a href="exercises.html#day14" class="exercise-link">→ Exercise: Trade Event Listener</a>
+  </div>
+</div>
 <div class="day milestone-day">
-  <div class="day-title">Day 21: 🏁 Milestone 3 — End-to-End Spring Integration</div>
+  <div class="day-title">Day 15: 🏁 Milestone 3 — Event-Driven Architecture</div>
   <div class="day-detail">
-    <span class="tag tag-project">Project</span> <span class="tag tag-review">Review</span>
-    <br>Combine E13–E17 into a fully working Spring Boot app. Send 8 trades under both profiles. Write a test report documenting input → expected → actual.
-    <br><a href="exercises.html#m3" class="exercise-link">→ Milestone 3: Spring Integration Test</a>
+    <span class="tag tag-project">Project</span>
+    <br>Listen for Trade Events from JMS, process them through the pipeline, and publish to an output queue.
+    <br><a href="exercises.html#m3" class="exercise-link">→ Milestone 3: End-to-End JMS Flow</a>
   </div>
 </div>
 
 <!-- ============ WEEK 4 ============ -->
-<div class="week-header">Week 4 — Design Patterns & Lombok</div>
-<p>Refactor your Week 3 project to use patterns. Your app gets more Exgester-like every day.</p>
+<div class="week-header">Week 4 — Testing, Build, & Quality</div>
+<p>Make the MiniExgester production-ready with BDD tests, code coverage, and Docker.</p>
 
-<div class="day build-day">
-  <div class="day-title">Day 22: 🏗️ Strategy — Pluggable Reportability Rules</div>
+<div class="day">
+  <div class="day-title">Day 16: BDD with Cucumber</div>
   <div class="day-detail">
     <span class="tag tag-knowledge">Knowledge</span> <span class="tag tag-build">Build</span>
-    <br>Extract reportability into a Strategy interface. 3 implementations (EMIR, CFTC, ASIC), injected via @Profile.
-    <br><strong>Source:</strong> <a href="https://refactoring.guru/design-patterns/strategy">Refactoring.Guru — Strategy</a>
-    <br><a href="exercises.html#e18" class="exercise-link">→ Exercise E18: Strategy: Pluggable Reportability</a>
+    <br>Writing Gherkin features for Trade Reporting rules.
+    <br><a href="exercises.html#day16" class="exercise-link">→ Exercise: Feature Files</a>
   </div>
 </div>
-
-<div class="day build-day">
-  <div class="day-title">Day 23: 🏗️ Factory — Submission Message Construction</div>
+<div class="day">
+  <div class="day-title">Day 17: Step Definitions & JUnit</div>
   <div class="day-detail">
     <span class="tag tag-knowledge">Knowledge</span> <span class="tag tag-build">Build</span>
-    <br>Factory creates region-specific messages with different required fields. Pipeline calls factory — doesn't know about subtypes.
-    <br><strong>Source:</strong> <a href="https://refactoring.guru/design-patterns/factory-method">Refactoring.Guru — Factory</a>
-    <br><a href="exercises.html#e19" class="exercise-link">→ Exercise E19: Factory: Submission Messages</a>
+    <br>Hooking Cucumber into Spring Boot tests.
+    <br><a href="exercises.html#day17" class="exercise-link">→ Exercise: Executable Specs</a>
   </div>
 </div>
-
-<div class="day build-day">
-  <div class="day-title">Day 24: 🏗️ Template Method — Common Flow, Client Overrides</div>
+<div class="day">
+  <div class="day-title">Day 18: Build & Quality</div>
   <div class="day-detail">
     <span class="tag tag-knowledge">Knowledge</span> <span class="tag tag-build">Build</span>
-    <br>Abstract base with fixed skeleton + overridable hooks. Two bank-specific subclasses.
-    <br><strong>Source:</strong> <a href="https://refactoring.guru/design-patterns/template-method">Refactoring.Guru — Template Method</a>
-    <br><a href="exercises.html#e20" class="exercise-link">→ Exercise E20: Template Method: Abstract Reporting Flow</a>
+    <br>Maven setup, JaCoCo coverage (70%), Checkstyle configuration.
+    <br><a href="exercises.html#day18" class="exercise-link">→ Exercise: CI/CD Quality Gates</a>
   </div>
 </div>
-
-<div class="day build-day">
-  <div class="day-title">Day 25: 🏗️ Chain of Responsibility — Dynamic Decision Steps</div>
+<div class="day">
+  <div class="day-title">Day 19: Containerization</div>
   <div class="day-detail">
     <span class="tag tag-knowledge">Knowledge</span> <span class="tag tag-build">Build</span>
-    <br>Configurable handler chain. Different chains per profile, configured in YAML.
-    <br><strong>Source:</strong> <a href="https://refactoring.guru/design-patterns/chain-of-responsibility">Refactoring.Guru — CoR</a>
-    <br><a href="exercises.html#e21" class="exercise-link">→ Exercise E21: Chain of Responsibility</a>
+    <br>Dockerizing the Application & ActiveMQ with docker-compose.
+    <br><a href="exercises.html#day19" class="exercise-link">→ Exercise: docker-compose setup</a>
   </div>
 </div>
-
-<div class="day build-day">
-  <div class="day-title">Day 26–27: 🏗️ Composite Rules & Full Lombok Conversion</div>
-  <div class="day-detail">
-    <span class="tag tag-knowledge">Knowledge</span> <span class="tag tag-build">Build</span>
-    <br>Build AND/OR composite rules. Convert entire codebase to Lombok <code>@Value</code>, <code>@Builder</code>, <code>@Slf4j</code>, <code>@RequiredArgsConstructor</code>.
-    <br><strong>Source:</strong> <a href="https://projectlombok.org/features/">Lombok Features</a>
-    <br><a href="exercises.html#e22" class="exercise-link">→ Exercise E22: Composite Rules & Lombok</a>
-  </div>
-</div>
-
 <div class="day milestone-day">
-  <div class="day-title">Day 28: 🏁 Milestone 4 — Pattern Recognition Challenge</div>
+  <div class="day-title">Day 20: 🏁 Milestone 4 — MiniExgester Capstone</div>
   <div class="day-detail">
-    <span class="tag tag-project">Project</span> <span class="tag tag-review">Review</span>
-    <br>Identify patterns in 6 code snippets. Refactor a 100-line imperative processor using Strategy + Factory + CoR.
-    <br><a href="exercises.html#m4" class="exercise-link">→ Milestone 4: Pattern Recognition & Refactoring</a>
-    <div class="build-note">⚡ Ask me <code>/teach pattern-recognition</code> or <code>/teach refactoring-challenge</code></div>
-  </div>
-</div>
-
-<!-- ============ WEEK 5 ============ -->
-<div class="week-header">Week 5 — Testing, Build Tools & Capstone</div>
-<p>Add tests. Configure build quality. Build the final capstone.</p>
-
-<div class="day build-day">
-  <div class="day-title">Day 29: 🏗️ JUnit 5 — Testing Decision Steps</div>
-  <div class="day-detail">
-    <span class="tag tag-knowledge">Knowledge</span> <span class="tag tag-build">Build</span>
-    <br><code>@Test</code>, <code>@ParameterizedTest</code>, <code>@Nested</code>. Write 15+ unit tests for your pipeline steps. Assert on Either.
-    <br><strong>Source:</strong> <a href="https://junit.org/junit5/docs/current/user-guide/">JUnit 5 User Guide</a>
-    <br><a href="exercises.html#e23" class="exercise-link">→ Exercise E23: JUnit 5 Pipeline Tests</a>
-  </div>
-</div>
-
-<div class="day build-day">
-  <div class="day-title">Day 30: 🏗️ Cucumber BDD — Feature Files</div>
-  <div class="day-detail">
-    <span class="tag tag-knowledge">Knowledge</span> <span class="tag tag-build">Build</span>
-    <br>Gherkin syntax, step definitions, <code>@CucumberContextConfiguration</code>. Write feature files for trade reporting scenarios.
-    <br><strong>Source:</strong> <a href="https://cucumber.io/docs/guides/">Cucumber Official Docs</a>
-    <br><a href="exercises.html#e24" class="exercise-link">→ Exercise E24: Cucumber BDD Feature Files</a>
-  </div>
-</div>
-
-<div class="day build-day">
-  <div class="day-title">Day 31: 🏗️ Scenario Outlines & Data-Driven Tests</div>
-  <div class="day-detail">
-    <span class="tag tag-build">Build</span>
-    <br>Data-driven testing across trade types, regions, and profiles with Scenario Outlines.
-    <br><a href="exercises.html#e25" class="exercise-link">→ Exercise E25: Scenario Outlines & Data Tables</a>
-  </div>
-</div>
-
-<div class="day build-day">
-  <div class="day-title">Day 32: 🏗️ Maven, JaCoCo & Build Quality</div>
-  <div class="day-detail">
-    <span class="tag tag-knowledge">Knowledge</span> <span class="tag tag-build">Build</span>
-    <br>Configure JaCoCo 70% coverage threshold. Run <code>mvn verify</code>. Read coverage report. Add tests until it passes.
-    <br><a href="exercises.html#e26" class="exercise-link">→ Exercise E26: Maven Build Quality</a>
-  </div>
-</div>
-
-<div class="day milestone-day">
-  <div class="day-title">Day 33–35: 🏆 CAPSTONE — Mini Exgester</div>
-  <div class="day-detail">
-    <span class="tag tag-project">Project</span> <span class="tag tag-build">Build</span>
-    <br><strong>Build a clean-room mini trade reporting engine</strong> combining every concept: JMS → Jackson → Either pipelines → Strategy → Factory → Template Method → CoR → Composite → Builder → 2 profiles → Cucumber BDD → JUnit → JaCoCo.
-    <br><a href="exercises.html#capstone" class="exercise-link">→ CAPSTONE: Mini Exgester (full spec with acceptance criteria)</a>
-    <div class="build-note">🏆 This is your graduation project — if you can build this, you can modify Exgester</div>
-  </div>
-</div>
-
-<!-- ============ BEYOND ============ -->
-<div class="week-header">Week 6+ — Ongoing Mastery</div>
-
-<div class="day">
-  <div class="day-title">Ongoing: Spaced Review Sessions</div>
-  <div class="day-detail">
-    <span class="tag tag-review">Review</span>
-    Every 3–4 days, revisit earlier concepts with retrieval practice. Ask me <code>/teach quiz-me</code>.
-  </div>
-</div>
-
-<div class="day">
-  <div class="day-title">Ongoing: Real Codebase Reading</div>
-  <div class="day-detail">
-    <span class="tag tag-skill">Skill</span>
-    Bring real Exgester code snippets for us to analyze together. Identify patterns, trace pipelines, debug flows.
-  </div>
-</div>
-
-<div class="day">
-  <div class="day-title">Ongoing: Regulatory Domain Deepening</div>
-  <div class="day-detail">
-    <span class="tag tag-knowledge">Knowledge</span>
-    As you encounter specific regulatory requirements at work, we'll build domain-specific lessons.
+    <span class="tag tag-project">Project</span>
+    <br>End-to-end BDD tests covering different client profiles running via Maven in Docker.
+    <br><a href="exercises.html#m4" class="exercise-link">→ Milestone 4: Final Capstone Integration</a>
   </div>
 </div>
 
 <hr>
-
 <nav class="lesson-nav">
   <a href="../index.html">← Home</a>
   <a href="exercises.html">Exercises →</a>
 </nav>
-
-<div class="ask-teacher">
-  <strong>Ready to start?</strong> Tell me <code>/teach</code> and I'll deliver your Day 1 lesson + E1 exercise guidance.
-</div>
 
 </body>
 </html>

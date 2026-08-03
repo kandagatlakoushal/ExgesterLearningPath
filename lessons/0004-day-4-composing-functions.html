@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day 4: Composing Functions</title>
+  <link rel="stylesheet" href="../assets/shared.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+
+<div class="lesson-meta">
+  <span><span class="tag tag-knowledge">Knowledge</span> Day 4</span>
+  <span>⏱️ 25 min read</span>
+</div>
+
+<h1>Day 4: Composing Functions (Building the Railway)</h1>
+
+<p>Yesterday, we learned that <code>Either&lt;L, R&gt;</code> represents a value that is either an error (Left) or a success (Right). Today, we learn how to chain multiple validation functions together to build a complete pipeline.</p>
+
+<p>In Exgester, a trade might go through 10-20 distinct checks. If any check fails, the trade is rejected and processing stops.</p>
+
+<h2>1. The Pipeline Blueprint</h2>
+
+<p>Let's define three distinct validation functions:</p>
+
+<pre><code class="language-java">
+public Either&lt;String, Trade&gt; hasValidId(Trade trade) {
+    return trade.tradeId() == null || trade.tradeId().isBlank() 
+        ? Either.left("Missing Trade ID") 
+        : Either.right(trade);
+}
+
+public Either&lt;String, Trade&gt; hasValidNotional(Trade trade) {
+    return trade.notional() &lt;= 0 
+        ? Either.left("Invalid Notional: " + trade.notional()) 
+        : Either.right(trade);
+}
+
+public Either&lt;String, Trade&gt; isSupportedRegion(Trade trade) {
+    return List.of("EMIR", "ASIC", "CFTC").contains(trade.region())
+        ? Either.right(trade)
+        : Either.left("Unsupported Region: " + trade.region());
+}
+</code></pre>
+
+<h2>2. Chaining with <code>flatMap</code></h2>
+
+<p>Because each function returns an <code>Either&lt;String, Trade&gt;</code>, we can chain them together using <code>flatMap</code>. Remember: <code>flatMap</code> only executes the next function if the current state is a <code>Right</code>!</p>
+
+<pre><code class="language-java">
+public Either&lt;String, Trade&gt; processTrade(Trade rawTrade) {
+    return hasValidId(rawTrade)
+        .flatMap(this::hasValidNotional)
+        .flatMap(this::isSupportedRegion);
+}
+</code></pre>
+
+<div class="callout tip">
+  <div class="callout-title">The Beauty of FlatMap</div>
+  <p>Look at how clean that <code>processTrade</code> method is! There are no <code>if</code> statements. There are no <code>try/catch</code> blocks. The control flow (the short-circuiting on failure) is entirely abstracted away by the <code>Either</code> monad.</p>
+</div>
+
+<h2>3. Peeking at the Tracks</h2>
+
+<p>What if you want to log the trade at a certain step, but you don't want to modify the pipeline? Vavr provides the <code>peek</code> and <code>peekLeft</code> methods.</p>
+
+<pre><code class="language-java">
+public Either&lt;String, Trade&gt; processTrade(Trade rawTrade) {
+    return hasValidId(rawTrade)
+        .peek(t -&gt; log.info("Trade ID is valid: {}", t.tradeId()))
+        .flatMap(this::hasValidNotional)
+        .flatMap(this::isSupportedRegion)
+        .peekLeft(error -&gt; log.error("Trade rejected: {}", error));
+}
+</code></pre>
+
+<hr>
+
+<h2>Your Build Task for Today</h2>
+
+<div class="callout warning">
+  <div class="callout-title">Exercise: Composable Pipeline Steps</div>
+  <p>Head over to <a href="../reference/exercises.html#day4">Exercises: Day 4</a>. You will construct a 5-step validation pipeline using <code>Either</code> and <code>flatMap</code>.</p>
+</div>
+
+<nav class="lesson-nav">
+  <a href="0003-day-3-rop-basics.html">← Previous: Day 3</a>
+  <a href="../reference/curriculum.html">Curriculum ↑</a>
+</nav>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+</body>
+</html>

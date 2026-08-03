@@ -3,214 +3,293 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="A structured 5-week learning path for mastering the Exgester trade reporting engine codebase — Vavr, Spring Boot, Design Patterns, and more.">
-  <meta name="theme-color" content="#1e1e2e">
+  <meta name="description" content="A structured 4-week learning path for mastering the Exgester trade reporting engine codebase — Vavr, Spring Boot, Design Patterns, and more.">
+  <meta name="theme-color" content="#0B0E14">
   <link rel="manifest" href="assets/manifest.json">
   <title>Exgester Mastery — Learning Path</title>
   <link rel="stylesheet" href="assets/shared.css">
   <style>
-    body { max-width: 42em; }
-
+    /* Page-Specific Styles Using Premium Tokens */
     .hero {
       text-align: center;
-      padding: 2rem 0 1.5rem;
-      border-bottom: 3px solid var(--accent);
-      margin-bottom: 2rem;
+      padding: 4rem 0 2rem;
+      position: relative;
     }
+    
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 20%; right: 20%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+    }
+    
     .hero h1 {
-      font-size: 2.2rem;
-      border: none;
-      padding: 0;
-      margin-bottom: 0.3rem;
+      font-size: 3.5rem;
+      margin-bottom: 0.5rem;
+      animation: pulse 4s infinite alternate;
     }
+
+    @keyframes pulse {
+      0% { text-shadow: 0 0 20px rgba(0, 240, 255, 0.4); }
+      100% { text-shadow: 0 0 40px rgba(0, 240, 255, 0.8), 0 0 10px rgba(112, 0, 255, 0.5); }
+    }
+
     .hero .subtitle {
-      font-family: var(--font-ui);
-      font-size: 0.95rem;
+      font-family: var(--font-body);
+      font-size: 1.1rem;
       color: var(--fg-muted);
+      max-width: 600px;
+      margin: 0 auto;
     }
 
     .nav-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      margin: 1.5rem 0;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin: 3rem 0;
     }
 
     .nav-card {
       display: flex;
       flex-direction: column;
-      padding: 1.25rem;
-      background: var(--bg-code);
-      border: 1px solid var(--border-light);
-      border-radius: 10px;
+      padding: 2rem;
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
       text-decoration: none;
       color: var(--fg);
-      transition: all 0.2s;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
     }
+
+    .nav-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(circle at top right, rgba(0,240,255,0.1), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
     .nav-card:hover {
-      border-color: var(--link);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-      transform: translateY(-2px);
+      transform: translateY(-5px) scale(1.02);
+      border-color: var(--accent-primary);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.4), 0 0 20px rgba(0,240,255,0.15);
     }
-    .nav-card .icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+
+    .nav-card:hover::before { opacity: 1; }
+
+    .nav-card .icon { 
+      font-size: 2.5rem; 
+      margin-bottom: 1rem;
+      filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+    }
+    
     .nav-card .card-title {
-      font-family: var(--font-ui);
-      font-weight: 600;
-      font-size: 0.95rem;
-      margin-bottom: 0.25rem;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+      color: #fff;
     }
+    
     .nav-card .card-desc {
-      font-size: 0.8rem;
+      font-size: 0.9rem;
       color: var(--fg-muted);
-      line-height: 1.4;
+      line-height: 1.5;
+      position: relative;
+      z-index: 1;
     }
 
     .section-header {
-      font-family: var(--font-ui);
-      font-size: 1.1rem;
+      font-family: var(--font-display);
+      font-size: 1.5rem;
       font-weight: 700;
-      color: var(--accent);
-      margin-top: 2.5rem;
-      margin-bottom: 0.75rem;
-      padding-bottom: 0.3rem;
-      border-bottom: 2px solid var(--accent);
+      color: var(--fg);
+      margin-top: 4rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .section-header::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--glass-border);
     }
 
     .lesson-list {
       list-style: none;
       margin: 0;
       padding: 0;
+      display: grid;
+      gap: 1rem;
     }
-    .lesson-list li {
-      margin: 0;
-      border-bottom: 1px solid var(--border-light);
-    }
+
+    .lesson-list li { margin: 0; }
+    
     .lesson-list a {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      padding: 0.75rem 0.5rem;
+      gap: 1rem;
+      padding: 1.25rem 1.5rem;
       text-decoration: none;
       color: var(--fg);
-      transition: background 0.15s;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      transition: all 0.3s ease;
     }
+    
     .lesson-list a:hover {
-      background: var(--bg-code);
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--accent-primary);
+      transform: translateX(10px);
+      box-shadow: -5px 5px 20px rgba(0, 240, 255, 0.1);
     }
+    
     .lesson-num {
       font-family: var(--font-code);
-      font-size: 0.75rem;
+      font-size: 0.85rem;
       font-weight: 600;
-      color: var(--fg-light);
-      min-width: 2.5rem;
+      color: var(--accent-primary);
+      background: rgba(0,240,255,0.1);
+      padding: 0.3rem 0.6rem;
+      border-radius: 6px;
     }
+    
     .lesson-title-text {
-      font-family: var(--font-ui);
-      font-size: 0.9rem;
+      font-family: var(--font-display);
+      font-size: 1.1rem;
       font-weight: 500;
-    }
-
-    .empty-state {
-      padding: 1.5rem;
-      text-align: center;
-      color: var(--fg-light);
-      font-family: var(--font-ui);
-      font-size: 0.88rem;
-      background: var(--bg-code);
-      border-radius: 8px;
     }
 
     .quick-actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.5rem;
-      margin: 1rem 0;
+      gap: 1rem;
+      margin: 1.5rem 0;
     }
+    
     .quick-actions a {
       display: inline-flex;
       align-items: center;
-      gap: 0.3rem;
-      padding: 0.4rem 0.8rem;
-      font-family: var(--font-ui);
-      font-size: 0.8rem;
-      font-weight: 500;
-      background: var(--bg-code);
-      border: 1px solid var(--border);
-      border-radius: 20px;
+      gap: 0.5rem;
+      padding: 0.7rem 1.2rem;
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 600;
+      background: transparent;
+      border: 1px solid var(--glass-border);
+      border-radius: 50px;
       text-decoration: none;
       color: var(--fg-muted);
-      transition: all 0.15s;
+      transition: all 0.3s ease;
     }
+    
     .quick-actions a:hover {
-      border-color: var(--link);
-      color: var(--link);
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+      background: rgba(0, 240, 255, 0.05);
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
     }
 
-    @media (max-width: 600px) {
-      .nav-grid { grid-template-columns: 1fr; }
-      .hero h1 { font-size: 1.6rem; }
+    .footer {
+      text-align: center;
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      color: var(--fg-light);
+      margin-top: 5rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--glass-border);
     }
   </style>
 </head>
 <body>
 
 <div class="hero">
-  <h1>🚂 Exgester Mastery</h1>
-  <p class="subtitle">A 5-week learning path for mastering S&P Global's trade reporting engine</p>
+  <h1>Exgester Mastery</h1>
+  <p class="subtitle">A 4-week project-oriented learning path for mastering S&P Global's trade reporting engine.</p>
 </div>
 
 <!-- ===== Quick Navigation Cards ===== -->
 <div class="nav-grid">
   <a href="reference/curriculum.html" class="nav-card">
     <span class="icon">📋</span>
-    <span class="card-title">5-Week Curriculum</span>
-    <span class="card-desc">Day-by-day plan with exercises, projects, and build milestones</span>
+    <span class="card-title">4-Week Curriculum</span>
+    <span class="card-desc">Day-by-day architectural plan with exercises, projects, and build milestones.</span>
   </a>
   <a href="reference/exercises.html" class="nav-card">
     <span class="icon">🔨</span>
     <span class="card-title">Hands-On Exercises</span>
-    <span class="card-desc">All coding exercises and project specs with acceptance criteria</span>
+    <span class="card-desc">All coding exercises and project specs with strict acceptance criteria.</span>
   </a>
   <a href="reference/prompt-library.html" class="nav-card">
     <span class="icon">🎯</span>
     <span class="card-title">Prompt Library</span>
-    <span class="card-desc">Copy-paste prompts for focused learning sessions</span>
+    <span class="card-desc">Advanced copy-paste AI prompts for focused, deep learning sessions.</span>
   </a>
   <a href="reference/glossary.html" class="nav-card">
     <span class="icon">📖</span>
     <span class="card-title">Glossary</span>
-    <span class="card-desc">Domain & technical vocabulary</span>
+    <span class="card-desc">Domain terminology and technical vocabulary specific to Exgester.</span>
   </a>
 </div>
 
 <!-- ===== Cheat Sheets ===== -->
-<div class="section-header">📚 Quick Reference Cheat Sheets</div>
+<div class="section-header">📚 Quick Reference</div>
 <div class="quick-actions">
-  <a href="reference/vavr-either-cheatsheet.html">🚂 Vavr Either</a>
+  <a href="reference/vavr-either-cheatsheet.html">🚂 Vavr Either API</a>
   <a href="reference/spring-profiles-cheatsheet.html">🌱 Spring Profiles</a>
   <a href="reference/design-patterns-cheatsheet.html">🏗️ Design Patterns</a>
 </div>
 
 <!-- ===== Lessons ===== -->
-<div class="section-header">📝 Lessons</div>
+<div class="section-header">📝 Core Lessons (Week 1)</div>
 <ul class="lesson-list" id="lessons-list">
-  <li><a href="lessons/0001-day-1-oop-and-solid.html">Day 1: OOP & SOLID in 60 Minutes</a></li>
-  <li><a href="lessons/0002-day-2-generics.html">Day 2: Generics — Reading Exgester's Type Signatures</a></li>
-  <li><a href="lessons/0003-day-3-lambdas.html">Day 3: Functional Interfaces & Lambdas</a></li>
+  <li>
+    <a href="lessons/0001-day-1-java-refresher.html">
+      <span class="lesson-num">Day 1</span>
+      <span class="lesson-title-text">Java 17 Refresher & Records</span>
+    </a>
+  </li>
+  <li>
+    <a href="lessons/0002-day-2-vavr-intro.html">
+      <span class="lesson-num">Day 2</span>
+      <span class="lesson-title-text">Introduction to Vavr (Option, Try, Tuple)</span>
+    </a>
+  </li>
+  <li>
+    <a href="lessons/0003-day-3-rop-basics.html">
+      <span class="lesson-num">Day 3</span>
+      <span class="lesson-title-text">Railway-Oriented Programming Basics</span>
+    </a>
+  </li>
+  <li>
+    <a href="lessons/0004-day-4-composing-functions.html">
+      <span class="lesson-num">Day 4</span>
+      <span class="lesson-title-text">Composing Functions with flatMap</span>
+    </a>
+  </li>
 </ul>
 
 <!-- ===== Progress ===== -->
-<div class="section-header">🗂️ Course Files</div>
+<div class="section-header">🗂️ Course Workspace</div>
 <div class="quick-actions">
   <a href="MISSION.md">📌 Mission</a>
   <a href="RESOURCES.md">📚 Resources</a>
   <a href="NOTES.md">📝 Notes</a>
 </div>
 
-<hr style="margin-top: 2.5rem;">
-<p style="text-align:center; font-family: var(--font-ui); font-size: 0.8rem; color: var(--fg-light); margin-top: 1rem;">
+<div class="footer">
   Exgester Learning Path &middot; S&P Global Market Intelligence &middot; Cappitech
-</p>
+</div>
 
 </body>
 </html>
