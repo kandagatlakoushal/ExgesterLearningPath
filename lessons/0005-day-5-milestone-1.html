@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day 5: Milestone 1 - Pure Java Decision Engine</title>
+  <link rel="stylesheet" href="../assets/shared.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+
+<div class="lesson-meta">
+  <span class="tag tag-project">Milestone Project</span>
+  <span>⏱️ 2 Hours to Build</span>
+</div>
+
+<h1>Milestone 1: Pure Java Decision Engine</h1>
+
+<p>Congratulations on reaching the end of Week 1! You've learned about deep immutability via Java 17 Records, handling side effects with Vavr's <code>Try</code>, and constructing scalable, fast-failing validation pipelines using <code>Either</code>.</p>
+
+<p>Before we move into Spring Boot, dependency injection, and messaging next week, we must solidify the core domain. The Exgester engine is fundamentally a pure function that takes a raw Trade JSON and outputs either a valid, enriched Trade or a specific Rejection. That logic should not require a framework.</p>
+
+<h2>1. The Architecture of the Engine</h2>
+
+<p>Your goal is to build a self-contained, highly testable engine package.</p>
+
+<div class="callout key-insight">
+  <div class="callout-title">The "Hexagonal" Core</div>
+  <p>In a Hexagonal Architecture (Ports and Adapters), the center of your application contains pure business rules with NO dependencies on external frameworks like Spring Data, JMS, or web servers. You are building this pure center today.</p>
+</div>
+
+<h3>The Entry Point</h3>
+<p>You will create an <code>ExgesterEngine</code> class. It exposes a single public method:</p>
+<pre><code class="language-java">
+public void process(String rawJsonMessage);
+</code></pre>
+<p>Inside this method, you will chain together the parser and the validation strategies. Finally, you will use <code>.fold()</code> to simulate the routing (printing the result to the console for now).</p>
+
+<h2>2. Strategy Pattern for Regulatory Rules</h2>
+
+<p>The core complexity of Exgester is that a trade must be reported to different regulatory bodies depending on its Region (e.g., <code>EMIR</code> for Europe, <code>ASIC</code> for Australia). You cannot hardcode these rules into a massive <code>if/else</code> block.</p>
+
+<p>You will implement an interface <code>RegulatoryStrategy</code>:</p>
+<pre><code class="language-java">
+public interface RegulatoryStrategy {
+    boolean supports(String region);
+    Either&lt;Rejection, NewTrade&gt; applyRules(NewTrade trade);
+}
+</code></pre>
+<p>Then, create implementations like <code>EmirStrategy</code> and <code>AsicStrategy</code>. The engine will evaluate the trade's region, pick the correct strategy, and apply its rules.</p>
+
+<h2>3. Testing the Pipeline</h2>
+
+<p>Because your code is purely functional, testing it is a breeze. You don't need mocking frameworks like Mockito yet. You simply pass in a JSON string, and assert the output.</p>
+
+<pre><code class="language-java">
+// A sample JUnit 5 test (Optional but highly recommended)
+@Test
+void whenMissingLei_thenFailsWithMissingLeiCode() {
+    String badJson = "{ \"tradeId\": \"123\", \"region\": \"EMIR\" }";
+    
+    // Process it through the pipeline
+    // Assert the output is a Rejection with code "MISSING_LEI"
+}
+</code></pre>
+
+<hr>
+
+<h2>Your Capstone Task</h2>
+
+<div class="callout warning">
+  <div class="callout-title">Exercise: Build the Engine</div>
+  <p>Head to <a href="../reference/exercises.html#milestone1">Exercises: Milestone 1</a> for the strict specification. This will take some time, so grab a coffee, open your IDE, and build the core of Exgester!</p>
+</div>
+
+<nav class="lesson-nav">
+  <a href="0004-day-4-composing-functions.html">← Previous: Day 4</a>
+  <a href="../reference/curriculum.html">Curriculum ↑</a>
+</nav>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+</body>
+</html>

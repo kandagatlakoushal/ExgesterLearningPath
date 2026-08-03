@@ -173,6 +173,32 @@
   </div>
 </div>
 
+<!-- ================= MILESTONE 1 ================= -->
+<div class="exercise-block" id="milestone1" style="border-color: var(--accent-primary); box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);">
+  <div class="exercise-header">
+    <span class="exercise-id">MILESTONE 1</span>
+    <span class="exercise-title">Pure Java Decision Engine</span>
+  </div>
+
+  <div class="spec-section">
+    <div class="spec-title">Specification</div>
+    <p>Construct a complete, framework-free decision engine. Create <code>ExgesterEngine</code> with a <code>process(String json)</code> method. Use a Strategy Pattern to execute different pipelines depending on the Trade's <code>region</code>.</p>
+  </div>
+
+  <div class="spec-section">
+    <div class="spec-title">Acceptance Criteria</div>
+    <ul class="acceptance-list">
+      <li><code>ExgesterEngine</code> initializes a <code>Map&lt;String, RegulatoryStrategy&gt;</code> containing at least an <code>EmirStrategy</code> and an <code>AsicStrategy</code>.</li>
+      <li>The <code>process()</code> method takes a raw JSON string.</li>
+      <li>It parses the JSON safely. If parsing fails, it prints a <code>Rejection</code> immediately.</li>
+      <li>If parsing succeeds, it determines the region, looks up the correct Strategy from the Map, and executes it.</li>
+      <li>The <code>EmirStrategy</code> and <code>AsicStrategy</code> both implement <code>Function&lt;NewTrade, Either&lt;Rejection, NewTrade&gt;&gt;</code> but contain <em>different</em> validation rules (e.g. EMIR requires LEI, ASIC requires a specific Notional threshold).</li>
+      <li>The pipeline must conclude with a terminal <code>.fold()</code> operation that either prints "Successfully processed for [Region]" or "Failed: [Rejection Reason]".</li>
+      <li>Write at least 3 JUnit 5 tests verifying: 1) Bad JSON fails fast, 2) An invalid EMIR trade is rejected correctly, 3) A valid ASIC trade passes.</li>
+    </ul>
+  </div>
+</div>
+
 <hr>
 <nav class="lesson-nav">
   <a href="../index.html">← Home</a>
